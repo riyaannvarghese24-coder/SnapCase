@@ -795,7 +795,12 @@ def common_login(request):
         login(request, user)
         if is_admin_user(user):
             return redirect('admin_dashboard')
-        if next_url == '/cart.html' and product_id.startswith('db-') and product_id[3:].isdigit():
+        safe_next_url = next_url and url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+        if safe_next_url and product_id.startswith('db-') and product_id[3:].isdigit():
             product = Product.objects.filter(pk=product_id[3:], is_active=True).first()
             if product is not None:
                 item, created = CartItem.objects.get_or_create(
@@ -805,11 +810,7 @@ def common_login(request):
                 )
                 if not created:
                     CartItem.objects.filter(pk=item.pk).update(quantity=F('quantity') + 1)
-        if next_url and url_has_allowed_host_and_scheme(
-            next_url,
-            allowed_hosts={request.get_host()},
-            require_https=request.is_secure(),
-        ):
+        if safe_next_url:
             return redirect(next_url)
         return redirect('customer_home')
 

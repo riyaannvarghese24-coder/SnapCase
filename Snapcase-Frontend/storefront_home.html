@@ -118,6 +118,7 @@
                                         {% if product.stock == 0 %}Unavailable{% else %}Add to cart{% endif %}
                                     </button>
                                 </div>
+                                <p class="cart-item-status" role="status" aria-live="polite" hidden></p>
                             </div>
                         </article>
                     {% endwith %}
@@ -163,7 +164,7 @@
                     const result = await response.json();
                     if (response.status === 401) {
                         const query = new URLSearchParams({
-                            next: "/cart.html",
+                            next: window.location.pathname + window.location.search,
                             product: button.dataset.productId
                         });
                         window.location.href = `/login/?${query}`;
@@ -173,7 +174,7 @@
                         throw new Error(result.error || "Could not add this cover to your cart.");
                     }
                     document.querySelector(".cart-count").textContent = result.count;
-                    window.location.href = "/cart.html";
+                    updateCartButtons(result.items);
                 } catch (error) {
                     window.alert(error.message);
                 } finally {
@@ -182,12 +183,35 @@
             });
         });
 
-        fetch("/api/session/")
-            .then((response) => response.json())
-            .then((session) => {
-                document.querySelector(".cart-count").textContent = session.count;
+        function updateCartButtons(items) {
+            const quantities = new Map(items.map((item) => [item.product_id, item.quantity]));
+            document.querySelectorAll(".add-cart").forEach((button) => {
+                const quantity = quantities.get(button.dataset.productId) || 0;
+                const status = button.closest(".product-info").querySelector(".cart-item-status");
+                if (quantity) {
+                    button.textContent = "Add another";
+                    status.textContent = `In cart · ${quantity}`;
+                    status.hidden = false;
+                } else {
+                    button.textContent = "Add to cart";
+                    status.textContent = "";
+                    status.hidden = true;
+                }
+            });
+        }
+
+        fetch("/api/cart/")
+            .then(async (response) => {
+                if (response.status === 401) return null;
+                if (!response.ok) throw new Error("Could not load your cart.");
+                return response.json();
             })
-            .catch((error) => window.console.error("Could not load cart count:", error));
+            .then((cart) => {
+                if (!cart) return;
+                document.querySelector(".cart-count").textContent = cart.count;
+                updateCartButtons(cart.items);
+            })
+            .catch((error) => window.console.error("Could not load cart:", error));
     </script>
 </body>
 </html>

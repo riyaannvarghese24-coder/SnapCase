@@ -212,14 +212,31 @@
         const message = document.getElementById("detail-message");
         const addButton = document.getElementById("detail-add-cart");
 
-        fetch("/api/session/")
-            .then((response) => response.json())
-            .then((session) => { cartCount.textContent = session.count; })
-            .catch((error) => window.console.error("Could not load cart count:", error));
+        function updateCartState(items, confirmation = false) {
+            const item = items.find((cartItem) => cartItem.product_id === addButton.dataset.productId);
+            if (!item) return;
+            addButton.textContent = "Add another";
+            message.classList.add("detail-message-success");
+            message.textContent = `${confirmation ? "Added to cart" : "In cart"} · ${item.quantity}`;
+        }
+
+        fetch("/api/cart/")
+            .then(async (response) => {
+                if (response.status === 401) return null;
+                if (!response.ok) throw new Error("Could not load your cart.");
+                return response.json();
+            })
+            .then((cart) => {
+                if (!cart) return;
+                cartCount.textContent = cart.count;
+                updateCartState(cart.items);
+            })
+            .catch((error) => window.console.error("Could not load cart:", error));
 
         addButton.addEventListener("click", async () => {
             addButton.disabled = true;
             message.textContent = "";
+            message.classList.remove("detail-message-success");
             try {
                 const response = await fetch("/api/cart/", {
                     method: "POST",
@@ -232,7 +249,7 @@
                 const result = await response.json();
                 if (response.status === 401) {
                     const query = new URLSearchParams({
-                        next: "/cart.html",
+                        next: window.location.pathname + window.location.search,
                         product: addButton.dataset.productId
                     });
                     window.location.href = `/login/?${query}`;
@@ -242,7 +259,7 @@
                     throw new Error(result.error || "Could not add this cover to your cart.");
                 }
                 cartCount.textContent = result.count;
-                window.location.href = "/cart.html";
+                updateCartState(result.items, true);
             } catch (error) {
                 message.textContent = error.message;
             } finally {

@@ -2,7 +2,12 @@ import json
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
 from django.test import Client, TestCase
+from django.test.utils import override_settings
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from .models import Brand, CartItem, Category, CustomerProfile, Order, OrderItem, Payment, PhoneModel, Product, ProductReview
 
@@ -128,6 +133,51 @@ class AuthenticationPageTests(TestCase):
         self.assertContains(response, 'Invalid username/email or password.')
         self.assertContains(response, 'auth-notification message-error')
 
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_forgot_password_flow_stays_on_customer_pages(self):
+        user = get_user_model().objects.create_user(
+            username='reset@example.com',
+            email='reset@example.com',
+            password='SecurePassword123!',
+        )
+        login_page = self.client.get('/login.html')
+        self.assertContains(login_page, 'href="/accounts/password_reset/"')
+
+        reset_page = self.client.get('/accounts/password_reset/')
+        self.assertEqual(reset_page.status_code, 200)
+        self.assertContains(reset_page, 'Reset your password')
+        self.assertNotContains(reset_page, 'admin-shell')
+
+        response = self.client.post('/accounts/password_reset/', {'email': user.email})
+        self.assertRedirects(response, '/accounts/password_reset/done/')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('/accounts/reset/', mail.outbox[0].body)
+
+        done_page = self.client.get('/accounts/password_reset/done/')
+        self.assertEqual(done_page.status_code, 200)
+        self.assertContains(done_page, 'Check your email')
+        self.assertNotContains(done_page, 'admin-shell')
+
+        encoded_user_id = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        confirm_path = f'/accounts/reset/{encoded_user_id}/{token}/'
+        confirm_page = self.client.get(confirm_path, follow=True)
+        self.assertEqual(confirm_page.status_code, 200)
+        self.assertContains(confirm_page, 'Choose a new password')
+        self.assertNotContains(confirm_page, 'admin-shell')
+
+        response = self.client.post(f'/accounts/reset/{encoded_user_id}/set-password/', {
+            'new_password1': 'NewSecurePassword456!',
+            'new_password2': 'NewSecurePassword456!',
+        })
+        self.assertRedirects(response, '/accounts/reset/done/')
+
+        complete_page = self.client.get('/accounts/reset/done/')
+        self.assertEqual(complete_page.status_code, 200)
+        self.assertContains(complete_page, 'Password updated')
+        self.assertNotContains(complete_page, 'admin-shell')
+        self.assertTrue(self.client.login(username=user.username, password='NewSecurePassword456!'))
+
 
 class CustomerAccountAndOrderTests(TestCase):
     def setUp(self):
@@ -155,6 +205,18 @@ class CustomerAccountAndOrderTests(TestCase):
             price='499.00',
             stock=5,
         )
+
+    def test_login_adds_requested_product_and_returns_to_storefront(self):
+        response = self.client.post('/login/', {
+            'username_or_email': self.customer.username,
+            'password': 'SecurePassword123!',
+            'next': '/home.html',
+            'product': f'db-{self.product.pk}',
+        })
+
+        self.assertRedirects(response, '/home.html')
+        cart_item = CartItem.objects.get(user=self.customer, product_id=f'db-{self.product.pk}')
+        self.assertEqual(cart_item.quantity, 1)
 
     def test_customer_can_update_profile_and_view_empty_order_history(self):
         self.client.force_login(self.customer)
@@ -263,6 +325,29 @@ class AndroidStorefrontTests(TestCase):
         self.assertNotContains(response, '>Apple</option>')
         self.assertContains(response, 'Samsung')
         self.assertContains(response, 'Realme')
+
+    def test_add_to_cart_feedback_is_shown_without_redirecting_to_cart(self):
+        brand = Brand.objects.create(name='Test Android')
+        phone_model = PhoneModel.objects.create(brand=brand, name='Test Android Model')
+        product = Product.objects.create(
+            name='Test Android Cover',
+            slug='test-android-cover',
+            brand=brand,
+            phone_model=phone_model,
+            category=self.category,
+            description='A product for add-to-cart feedback tests.',
+            price='499.00',
+            stock=5,
+        )
+
+        storefront = self.client.get('/home.html')
+        detail = self.client.get(f'/products/{product.pk}/')
+
+        self.assertContains(storefront, f'data-product-id="db-{product.pk}"')
+        self.assertContains(storefront, 'class="cart-item-status"')
+        self.assertNotContains(storefront, 'window.location.href = "/cart.html"')
+        self.assertContains(detail, 'id="detail-message"')
+        self.assertNotContains(detail, 'window.location.href = "/cart.html"')
 
     def test_apple_product_detail_is_not_available_in_storefront(self):
         response = self.client.get(f'/products/{self.apple_product.pk}/')
