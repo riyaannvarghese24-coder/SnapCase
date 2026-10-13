@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SnapCase - Phone Cases</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+
+            background: #fffdf8;
+
+            color: #171717;
+
+            padding-bottom: 75px;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+
+            height: 85px;
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 45px;
+
+            border-bottom: 1px solid #eeeeee;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+
+        }
+
+
+        /* LOGO */
+
+        .logo {
+
+            width: 210px;
+
+            height: auto;
+
+            display: block;
+
+        }
+
+
+        /* NAVIGATION */
+
+        .navbar {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 35px;
+
+        }
+
+
+        .navbar a {
+
+            text-decoration: none;
+
+            color: #222;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            padding: 30px 0;
+
+            position: relative;
+
+        }
+
+
+        .navbar a:hover {
+
+            color: #e8a900;
+
+        }
+
+
+        .navbar a.active {
+
+            color: #111;
+
+        }
+
+
+        .navbar a.active::after {
+
+            content: "";
+
+            position: absolute;
+
+            bottom: 19px;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 3px;
+
+            background: #f5b719;
+
+            border-radius: 5px;
+
+        }
+
+
+        /* HEADER ICONS */
+
+        .header-icons {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 25px;
+
+        }
+
+
+        .header-icon {
+
+            text-align: center;
+
+            cursor: pointer;
+
+            font-size: 22px;
+
+            color: #171717;
+
+            text-decoration: none;
+
+        }
+
+
+        .header-icon p {
+
+            font-size: 11px;
+
+            margin-top: 4px;
+
+            color: #222;
+
+        }
+
+
+        .cart {
+
+            position: relative;
+
+        }
+
+
+        .cart-count {
+
+            position: absolute;
+
+            top: -5px;
+
+            right: -8px;
+
+            background: #f5b719;
+
+            width: 17px;
+
+            height: 17px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 10px;
+
+            font-weight: bold;
+
+        }
+
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+
+            min-height: 410px;
+
+            background: #fffdf8;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 40px 6%;
+
+            overflow: hidden;
+
+        }
+
+
+        .hero-text {
+
+            width: 45%;
+
+        }
+
+
+        .hero-text h1 {
+
+            font-size: 54px;
+
+            line-height: 1.05;
+
+            margin-bottom: 12px;
+
+            font-weight: 800;
+
+        }
+
+
+        .hero-text h1 span {
+
+            color: #f2b319;
+
+        }
+
+
+        .tagline {
+
+            font-size: 25px;
+
+            font-weight: bold;
+
+            font-style: italic;
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .tagline span {
+
+            color: #f0ad00;
+
+        }
+
+
+        .hero-description {
+
+            color: #666;
+
+            font-size: 15px;
+
+            line-height: 1.6;
+
+            max-width: 450px;
+
+        }
+
+
+        /* =========================
+           PLAIN PHONE CASE IMAGES
+        ========================= */
+
+        .hero-cases {
+
+            width: 50%;
+
+            height: 340px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 18px;
+
+        }
+
+
+        .hero-case {
+
+            width: 145px;
+
+            height: 265px;
+
+            border-radius: 27px;
+
+            overflow: hidden;
+
+            box-shadow:
+
+                0 15px 30px rgba(0,0,0,0.15);
+
+            border: 3px solid rgba(0,0,0,0.08);
+
+            position: relative;
+
+            background: #fff;
+
+        }
+
+
+        .hero-case img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            object-position: center;
+
+            display: block;
+
+        }
+
+
+        /* =========================
+           POPULAR SECTION
+        ========================= */
+
+        .popular {
+
+            background: white;
+
+            padding: 35px 5% 70px;
+
+        }
+
+
+        .section-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: end;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .section-label {
+
+            font-size: 12px;
+
+            letter-spacing: 3px;
+
+            font-weight: bold;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .section-label::before {
+
+            content: "";
+
+            display: inline-block;
+
+            width: 25px;
+
+            height: 3px;
+
+            background: #f5b719;
+
+            margin-right: 10px;
+
+            vertical-align: middle;
+
+        }
+
+
+        .section-title {
+
+            font-size: 37px;
+
+            font-weight: 800;
+
+        }
+
+
+        .section-title span {
+
+            color: #f1b11b;
+
+            font-style: italic;
+
+        }
+
+
+        .view-all {
+
+            text-decoration: none;
+
+            color: #111;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+        }
+
+
+        .view-all:hover {
+
+            color: #e7a600;
+
+        }
+
+
+        /* =========================
+           PRODUCT GRID
+        ========================= */
+
+        .products {
+
+            display: grid;
+
+            grid-template-columns:
+
+                repeat(4, 1fr);
+
+            gap: 20px;
+
+        }
+
+
+        .product-card {
+
+            background: white;
+
+            border: 1px solid #e9e9e9;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            box-shadow:
+
+                0 3px 12px rgba(0,0,0,0.07);
+
+            transition: 0.3s;
+
+        }
+
+
+        .product-card:hover {
+
+            transform: translateY(-5px);
+
+            box-shadow:
+
+                0 10px 25px rgba(0,0,0,0.1);
+
+        }
+
+
+        .product-image {
+
+            height: 225px;
+
+            background: #f5efe5;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+
+        .product-image img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            padding: 10px;
+
+            display: block;
+
+        }
+
+
+        .heart {
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 10px;
+
+            width: 32px;
+
+            height: 32px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 18px;
+
+            cursor: pointer;
+
+            box-shadow:
+
+                0 2px 7px rgba(0,0,0,0.1);
+
+        }
+
+
+        .product-info {
+
+            padding: 12px;
+
+        }
+
+
+        .product-name {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 6px;
+
+        }
+
+
+        .rating {
+
+            font-size: 12px;
+
+            margin-bottom: 7px;
+
+        }
+
+
+        .stars {
+
+            color: #f5b400;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        .review-count {
+
+            color: #444;
+
+            margin-left: 4px;
+
+        }
+
+
+        .price {
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .add-cart {
+
+            width: 100%;
+
+            border: none;
+
+            background: #f7bc18;
+
+            border-radius: 25px;
+
+            padding: 9px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+        }
+
+
+        .add-cart:hover {
+
+            background: #efa900;
+
+        }
+
+
+        /* =========================
+           BOTTOM NAVIGATION
+        ========================= */
+
+        .bottom-nav {
+
+            position: fixed;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 70px;
+
+            background: white;
+
+            border-top: 1px solid #ddd;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-around;
+
+            z-index: 2000;
+
+        }
+
+
+        .bottom-item {
+
+            text-align: center;
+
+            font-size: 11px;
+
+            color: #222;
+
+            cursor: pointer;
+
+        }
+
+
+        .bottom-item div {
+
+            font-size: 23px;
+
+            margin-bottom: 3px;
+
+        }
+
+
+        .bottom-item.active {
+
+            color: #f1b000;
+
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            header {
+
+                padding: 0 25px;
+
+            }
+
+
+            .navbar {
+
+                gap: 20px;
+
+            }
+
+
+            .products {
+
+                grid-template-columns:
+
+                    repeat(3, 1fr);
+
+            }
+
+
+            .hero-text h1 {
+
+                font-size: 45px;
+
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            header {
+
+                height: 70px;
+
+            }
+
+
+            .logo {
+
+                width: 160px;
+
+            }
+
+
+            .navbar {
+
+                display: none;
+
+            }
+
+
+            .header-icons {
+
+                gap: 15px;
+
+            }
+
+
+            .hero {
+
+                flex-direction: column;
+
+                text-align: center;
+
+                padding: 45px 20px;
+
+            }
+
+
+            .hero-text {
+
+                width: 100%;
+
+            }
+
+
+            .hero-description {
+
+                margin: auto;
+
+            }
+
+
+            .hero-cases {
+
+                width: 100%;
+
+                margin-top: 30px;
+
+                height: 300px;
+
+            }
+
+
+            .hero-case {
+
+                width: 95px;
+
+                height: 190px;
+
+            }
+
+
+            .products {
+
+                grid-template-columns:
+
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .header-icons .header-icon:nth-child(2) {
+
+                display: none;
+
+            }
+
+
+            .hero-text h1 {
+
+                font-size: 38px;
+
+            }
+
+
+            .tagline {
+
+                font-size: 20px;
+
+            }
+
+
+            .hero-case {
+
+                width: 72px;
+
+                height: 155px;
+
+            }
+
+
+            .hero-cases {
+
+                gap: 8px;
+
+            }
+
+
+            .products {
+
+                grid-template-columns: 1fr;
+
+            }
+
+
+            .section-title {
+
+                font-size: 30px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+
+        <!-- LOGO -->
+
+        <a href="home.html">
+
+            <img
+                src="static/images/snapcaseLogo.png"
+                alt="SnapCase"
+                class="logo"
+            >
+
+        </a>
+
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="navbar">
+
+            <a
+                href="home.html"
+                class="active">
+                Home
+            </a>
+
+            <a href="#">
+                Categories
+            </a>
+
+            <a href="#">
+                About
+            </a>
+
+            <a href="#">
+                Contact
+            </a>
+
+        </nav>
+
+
+
+        <!-- HEADER ICONS -->
+
+        <div class="header-icons">
+
+
+            <div class="header-icon">
+
+                ♡
+
+                <p>
+                    Favourites
+                </p>
+
+            </div>
+
+
+            <div class="header-icon">
+
+                🔍
+
+                <p>
+                    Search
+                </p>
+
+            </div>
+
+
+            <a class="header-icon cart" href="cart.html" aria-label="Open cart">
+
+                🛒
+
+                <span class="cart-count">
+                    0
+                </span>
+
+                <p>
+                    Cart
+                </p>
+
+            </a>
+
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         HERO
+    ========================= -->
+
+    <section class="hero">
+
+
+        <div class="hero-text">
+
+
+            <h1>
+
+                Snap<span>Case</span>
+
+            </h1>
+
+
+            <div class="tagline">
+
+                Your Phone.
+                <span>Your Style.</span>
+
+            </div>
+
+
+            <p class="hero-description">
+
+                Premium phone cases designed to protect
+                your device and express your unique style.
+
+            </p>
+
+
+        </div>
+
+
+
+        <!--
+            PLAIN CASES
+            No decorations
+        -->
+
+        <div class="hero-cases">
+
+
+            <div class="hero-case">
+
+                <img
+                    src="static/images/plain-black.jpg"
+                    alt="Black Phone Case"
+                >
+
+            </div>
+
+
+            <div class="hero-case">
+
+                <img
+                    src="static/images/plain-yellow.jpg"
+                    alt="Yellow Phone Case"
+                >
+
+            </div>
+
+
+            <div class="hero-case">
+
+                <img
+                    src="static/images/plain-white.jpg"
+                    alt="White Phone Case"
+                >
+
+            </div>
+
+
+            <div class="hero-case">
+
+                <img
+                    src="static/images/plain-clear.jpg"
+                    alt="Clear Phone Case"
+                >
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         POPULAR CASES
+    ========================= -->
+
+    <section class="popular">
+
+
+        <div class="section-top">
+
+
+            <div>
+
+                <div class="section-label">
+                    TRENDING NOW
+                </div>
+
+
+                <h2 class="section-title">
+
+                    Popular
+                    <span>Cases</span>
+
+                </h2>
+
+            </div>
+
+
+            <a
+                href="#"
+                class="view-all">
+
+                View All →
+
+            </a>
+
+        </div>
+
+
+
+        <!-- PRODUCT GRID -->
+
+        <div class="products">
+
+
+
+            <!-- PRODUCT 1 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/black-case.jpg"
+                        alt="Black Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Black Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (124)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹299
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="black">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 2 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/smile-case.jpg"
+                        alt="Smile Always Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Smile Always Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (98)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹349
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="smile">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 3 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/floral-case.jpg"
+                        alt="Floral Clear Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Floral Clear Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (156)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹249
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="floral">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 4 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/pastel-case.jpg"
+                        alt="Pastel Waves Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Pastel Waves Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (112)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹399
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="pastel">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 5 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/plain-pink.jpg"
+                        alt="Pink Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Soft Pink Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (112)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹349
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="pink">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 6 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/black-case.jpg"
+                        alt="Black Rugged Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Rugged Pro Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (87)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹649
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="rugged">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 7 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/check-case.jpg"
+                        alt="Check Case"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Trendy Check Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (73)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹379
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="check">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- PRODUCT 8 -->
+
+            <div class="product-card">
+
+
+                <div class="product-image">
+
+                    <img
+                        src="static/images/heart-case.jpg"
+                        alt="Pink geometric phone cover"
+                    >
+
+                    <div class="heart">
+                        ♡
+                    </div>
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <div class="product-name">
+                        Pink Geo Case
+                    </div>
+
+
+                    <div class="rating">
+
+                        <span class="stars">
+                            ★★★★★
+                        </span>
+
+                        <span class="review-count">
+                            (66)
+                        </span>
+
+                    </div>
+
+
+                    <div class="price">
+                        ₹499
+                    </div>
+
+
+                    <button class="add-cart" data-product-id="geo">
+
+                        🛒 &nbsp; Add to Cart
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         BOTTOM NAVIGATION
+    ========================= -->
+
+    <div class="bottom-nav">
+
+
+        <div class="bottom-item">
+
+            <div>
+                ◴
+            </div>
+
+            History
+
+        </div>
+
+
+        <div class="bottom-item">
+
+            <div>
+                ◇
+            </div>
+
+            Explore
+
+        </div>
+
+
+        <div class="bottom-item active">
+
+            <div>
+                🏠
+            </div>
+
+            Home
+
+        </div>
+
+
+        <div class="bottom-item">
+
+            <div>
+                ♙
+            </div>
+
+            Profile
+
+        </div>
+
+
+        <div class="bottom-item">
+
+            <div>
+                ⋮
+            </div>
+
+            More
+
+        </div>
+
+
+    </div>
+
+    <script>
+        function getCsrfToken() {
+            return document.cookie
+                .split("; ")
+                .find((cookie) => cookie.startsWith("csrftoken="))
+                ?.split("=")[1];
+        }
+        const cartCount = document.querySelector(".cart-count");
+
+        async function updateCartCount() {
+            const response = await fetch("api/session/");
+            if (!response.ok) {
+                throw new Error("Could not load your account status.");
+            }
+            const session = await response.json();
+            cartCount.textContent = session.count;
+        }
+
+        document.querySelectorAll(".add-cart").forEach((button) => {
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+                try {
+                    const response = await fetch("api/cart/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCsrfToken()
+                        },
+                        body: JSON.stringify({ product_id: button.dataset.productId })
+                    });
+                    if (response.status === 401) {
+                        const query = new URLSearchParams({
+                            next: "cart.html",
+                            product: button.dataset.productId
+                        });
+                        window.location.href = `login.html?${query}`;
+                        return;
+                    }
+                    if (!response.ok) {
+                        const result = await response.json();
+                        throw new Error(result.error || "Could not add this item to your cart.");
+                    }
+                    window.location.href = "cart.html";
+                } catch (error) {
+                    window.alert(error.message);
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+
+        updateCartCount().catch((error) => window.console.error(error));
+    </script>
+
+</body>
+
+</html>

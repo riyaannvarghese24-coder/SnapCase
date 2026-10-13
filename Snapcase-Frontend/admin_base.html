@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SnapCase Admin Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/admin-dashboard.css' %}">
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="sidebar" id="sidebar">
+            <div class="brand-block">
+                <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase logo" class="sidebar-logo">
+                <div>
+                    <p class="eyebrow">Management</p>
+                    <h2>Admin</h2>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">Overview</a>
+                <a href="{% url 'admin_products' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_products' %}active{% endif %}">Products</a>
+                <a href="{% url 'admin_categories' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_categories' %}active{% endif %}">Categories</a>
+                <a href="{% url 'admin_brands' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_brands' %}active{% endif %}">Brands</a>
+                <a href="{% url 'admin_phone_models' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_phone_models' %}active{% endif %}">Phone Models</a>
+                <a href="{% url 'admin_orders' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_orders' %}active{% endif %}">Orders</a>
+                <a href="{% url 'admin_payments' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}">Payments</a>
+                <a href="{% url 'admin_users' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">Users</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="profile-panel">
+                    <div class="avatar">{{ user.first_name|first|default:user.username|first|upper }}</div>
+                    <div>
+                        <strong>{{ user.get_full_name|default:user.username }}</strong>
+                        <span>Administrator</span>
+                    </div>
+                </div>
+                <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-panel">
+            <header class="topbar">
+                <button class="sidebar-toggle" type="button" aria-label="Toggle navigation">☰</button>
+                <div>
+                    <p class="eyebrow">SnapCase</p>
+                    <h1>{% block page_title %}Admin Dashboard{% endblock %}</h1>
+                </div>
+            </header>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message message-{{ message.tags|default:'info' }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{% static 'js/admin-dashboard.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders | SnapCase</title>
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
+            <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
+        </a>
+        <nav aria-label="Account navigation">
+            <a href="{% url 'customer_home' %}">Shop</a>
+            <a href="{% url 'customer_account' %}">Your account</a>
+        </nav>
+        <div class="header-actions">
+            <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
+            <a href="/cart.html">Cart</a>
+        </div>
+    </header>
+    <main class="customer-page">
+        <div class="customer-page-heading">
+            <div>
+                <p class="kicker">ORDER HISTORY</p>
+                <h1>Your orders</h1>
+                <p>Track your purchases and review the items in each order.</p>
+            </div>
+            <a class="customer-secondary-button" href="{% url 'customer_home' %}">Continue shopping</a>
+        </div>
+        <section class="order-list" aria-label="Your orders">
+            {% for order in orders %}
+                <article class="order-card">
+                    <div class="order-card-header">
+                        <div>
+                            <span class="order-label">ORDER PLACED</span>
+                            <strong>{{ order.created_at|date:"M j, Y" }}</strong>
+                        </div>
+                        <div>
+                            <span class="order-label">TOTAL</span>
+                            <strong>₹{{ order.total }}</strong>
+                        </div>
+                        <div>
+                            <span class="order-label">ORDER NUMBER</span>
+                            <strong>{{ order.order_number }}</strong>
+                        </div>
+                        <a class="order-detail-link" href="{% url 'customer_order_detail' order.id %}">View order details</a>
+                    </div>
+                    <div class="order-card-body">
+                        <div>
+                            <span class="order-status status-{{ order.status|lower }}">{{ order.status }}</span>
+                            <p class="order-status-caption">
+                                {% if order.status == 'Delivered' %}Delivered{% elif order.status == 'Shipped' %}On the way{% elif order.status == 'Cancelled' %}This order was cancelled{% else %}We’re preparing your order{% endif %}
+                            </p>
+                        </div>
+                        <div class="order-products">
+                            {% for item in order.items.all %}
+                                <div class="order-product">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                    {% elif item.product.catalog_image %}
+                                        <img src="{% static 'images/' %}{{ item.product.catalog_image }}" alt="{{ item.product.name }}">
+                                    {% else %}
+                                        <img src="{% static 'images/plain-clear.jpg' %}" alt="{{ item.product.name }}">
+                                    {% endif %}
+                                    <div>
+                                        <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
+                                        <p>Quantity: {{ item.quantity }} · ₹{{ item.unit_price }} each</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="customer-panel customer-empty large-empty">
+                    <h2>No orders yet</h2>
+                    <p>Once you place an order, you can track its status and see its details here.</p>
+                    <a class="customer-primary-button" href="{% url 'customer_home' %}">Shop phone covers</a>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,140 @@
+{% extends 'admin_base.html' %}
+{% block title %}Manage Products{% endblock %}
+{% block page_title %}Manage Products{% endblock %}
+
+{% block content %}
+<section class="management-layout">
+    <div class="form-card">
+        <h3 class="panel-title">{% if selected_product %}Edit Product{% else %}Add Product{% endif %}</h3>
+        <form method="post" enctype="multipart/form-data" class="form-grid">
+            {% csrf_token %}
+            {% if selected_product %}<input type="hidden" name="product_id" value="{{ selected_product.id }}">{% endif %}
+            <div class="form-row">
+                <label for="name">Product name</label>
+                <input id="name" name="name" value="{{ selected_product.name|default:'' }}" required>
+            </div>
+            <div class="form-row">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" required>{{ selected_product.description|default:'' }}</textarea>
+            </div>
+            <div class="form-row">
+                <label for="price">Price</label>
+                <input id="price" type="number" step="0.01" min="0.01" name="price" value="{{ selected_product.price|default:'0' }}" required>
+            </div>
+            <div class="form-row">
+                <label for="stock">Stock</label>
+                <input id="stock" type="number" min="0" name="stock" value="{{ selected_product.stock|default:'0' }}" required>
+            </div>
+            <div class="form-row">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="">Select category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_product and selected_product.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="brand">Brand</label>
+                <select id="brand" name="brand">
+                    <option value="">Select brand</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if selected_product and selected_product.brand_id == brand.id %}selected{% endif %}>{{ brand.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="phone_model">Phone model</label>
+                <select id="phone_model" name="phone_model">
+                    <option value="">Select model</option>
+                    {% for model in phone_models %}
+                        <option value="{{ model.id }}" {% if selected_product and selected_product.phone_model_id == model.id %}selected{% endif %}>{{ model.brand.name }} - {{ model.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="image">Product image</label>
+                <input id="image" type="file" name="image" accept="image/*">
+                {% if selected_product and selected_product.image %}
+                    <div class="checkbox-row">
+                        <input id="remove_image" type="checkbox" name="remove_image">
+                        <label for="remove_image">Remove current image</label>
+                    </div>
+                    <img src="{{ selected_product.image.url }}" alt="{{ selected_product.name }}" style="max-width: 140px; border-radius: 12px; margin-top: 0.5rem;">
+                {% endif %}
+            </div>
+            <div class="checkbox-row">
+                <input id="is_active" type="checkbox" name="is_active" {% if selected_product and selected_product.is_active or not selected_product %}checked{% endif %}>
+                <label for="is_active">Active product</label>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="primary-button">{% if selected_product %}Update Product{% else %}Save Product{% endif %}</button>
+                {% if selected_product %}
+                    <a href="{% url 'admin_products' %}" class="secondary-button">Cancel</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h3 class="panel-title">Products</h3>
+            <a href="{% url 'admin_products' %}" class="link-button">Reset</a>
+        </div>
+
+        <form method="get" class="search-form">
+            <input class="search-field" type="search" name="search" value="{{ search }}" placeholder="Search products">
+            <select name="category">
+                <option value="">All categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="brand">
+                <option value="">All brands</option>
+                {% for brand in brands %}
+                    <option value="{{ brand.id }}" {% if brand_filter == brand.id|stringformat:'s' %}selected{% endif %}>{{ brand.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="primary-button">Search</button>
+        </form>
+
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.category.name|default:'-' }}</td>
+                            <td>{{ product.brand.name|default:'-' }}</td>
+                            <td>₹{{ product.price }}</td>
+                            <td>{{ product.stock }}</td>
+                            <td class="actions-cell">
+                                <a href="?edit={{ product.id }}" class="inline-button">Edit</a>
+                                <form method="post" data-confirm-delete="true" data-confirm-message="Delete {{ product.name }}?" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <button type="submit" class="danger-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6" class="empty-state">No products found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'admin_base.html' %}
+{% block title %}Manage Orders{% endblock %}
+{% block page_title %}Manage Orders{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <div class="panel-header">
+        <h3 class="panel-title">Orders</h3>
+        <a href="{% url 'admin_orders' %}" class="link-button">Reset</a>
+    </div>
+
+    <form method="get" class="search-form">
+        <input class="search-field" type="search" name="search" value="{{ search }}" placeholder="Search order, customer, or email">
+        <select name="status">
+            <option value="">All statuses</option>
+            {% for status in order_statuses %}
+                <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="primary-button">Search</button>
+    </form>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in orders %}
+                    {% with order=item.order %}
+                        <tr>
+                            <td>#{{ order.order_number }}</td>
+                            <td>{{ order.customer.get_full_name|default:order.customer.username }}</td>
+                            <td>{{ order.created_at|date:'d M Y' }}</td>
+                            <td>
+                                {% for order_item in item.items %}
+                                    {{ order_item.product.name }} x {{ order_item.quantity }}<br>
+                                {% empty %}
+                                    -
+                                {% endfor %}
+                            </td>
+                            <td>₹{{ order.total }}</td>
+                            <td><span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span></td>
+                            <td>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                    <select name="status">
+                                        {% for status in order_statuses %}
+                                            <option value="{{ status }}" {% if order.status == status %}selected{% endif %}>{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="inline-button">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                {% empty %}
+                    <tr><td colspan="7" class="empty-state">No orders found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

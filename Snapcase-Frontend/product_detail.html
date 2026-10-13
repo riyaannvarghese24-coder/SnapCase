@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} | SnapCase</title>
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
+            <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
+        </a>
+        <nav aria-label="Main navigation">
+            <a href="{% url 'customer_home' %}">Home</a>
+            <a class="active" href="{% url 'customer_home' %}#covers">Phone Covers</a>
+        </nav>
+        <div class="header-actions">
+            <a class="cart-link" href="/cart.html">Cart <span class="cart-count" aria-live="polite">0</span></a>
+            {% if user.is_authenticated %}
+                <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
+                <a href="{% url 'logout' %}">Log out</a>
+            {% else %}
+                <a href="{% url 'login' %}">Log in</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="detail-page">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <a href="{% url 'customer_home' %}">Home</a>
+            <span aria-hidden="true">›</span>
+            <a href="{% url 'customer_home' %}#covers">Phone Covers</a>
+            {% if product.brand %}
+                <span aria-hidden="true">›</span>
+                <span>{{ product.brand.name }}</span>
+            {% endif %}
+        </nav>
+
+        <section class="detail-layout">
+            <div class="detail-gallery">
+                <div class="detail-main-image">
+                    <img src="{{ image_url }}" alt="{{ product.name }}">
+                </div>
+                <p class="gallery-caption">SnapCase phone cover</p>
+            </div>
+
+            <div class="detail-information">
+                <p class="compatibility">
+                    {% if product.brand %}{{ product.brand.name }}{% else %}Universal{% endif %}
+                    {% if product.phone_model %} · {{ product.phone_model.name }}{% endif %}
+                </p>
+                <h1>{{ product.name }}</h1>
+                <div class="detail-rating" aria-label="{{ average_rating|floatformat:1 }} out of 5 stars, {{ review_count }} reviews">
+                    <span class="rating-stars" aria-hidden="true">{% for star in "12345" %}{% if forloop.counter <= rating_stars %}★{% else %}☆{% endif %}{% endfor %}</span>
+                    {% if review_count %}
+                        <strong>{{ average_rating|floatformat:1 }} out of 5</strong>
+                        <a href="#customer-reviews">{{ review_count }} review{{ review_count|pluralize }}</a>
+                        {% if sample_review_count %}<span class="sample-disclosure">Includes {{ sample_review_count }} labeled sample review{{ sample_review_count|pluralize }}</span>{% endif %}
+                    {% else %}
+                        <span>No reviews yet</span>
+                    {% endif %}
+                </div>
+                <p class="detail-description">{{ product.description }}</p>
+
+                <div class="detail-price">₹{{ product.price }}</div>
+                <p class="tax-note">Price shown in Indian Rupees.</p>
+
+                <div class="availability {% if product.stock == 0 %}unavailable{% endif %}">
+                    {% if product.stock > 0 %}
+                        In stock · {{ product.stock }} available
+                    {% else %}
+                        Currently unavailable
+                    {% endif %}
+                </div>
+
+                <div class="detail-actions">
+                    <button
+                        class="detail-add-cart"
+                        id="detail-add-cart"
+                        type="button"
+                        data-product-id="db-{{ product.id }}"
+                        {% if product.stock == 0 %}disabled{% endif %}>
+                        {% if product.stock > 0 %}Add to cart{% else %}Unavailable{% endif %}
+                    </button>
+                    <a class="detail-continue" href="{% url 'customer_home' %}#covers">Continue shopping</a>
+                </div>
+                <p id="detail-message" class="detail-message" role="status" aria-live="polite"></p>
+
+                <section class="detail-specifications" aria-labelledby="specifications-heading">
+                    <h2 id="specifications-heading">Product details</h2>
+                    <dl>
+                        <div><dt>Compatible brand</dt><dd>{{ product.brand.name|default:'Universal' }}</dd></div>
+                        <div><dt>Compatible model</dt><dd>{{ product.phone_model.name|default:'Not specified' }}</dd></div>
+                        <div><dt>Category</dt><dd>{{ product.category.name|default:'Phone cover' }}</dd></div>
+                        <div><dt>Availability</dt><dd>{% if product.stock > 0 %}In stock{% else %}Out of stock{% endif %}</dd></div>
+                        <div><dt>Product code</dt><dd>{{ product.slug }}</dd></div>
+                    </dl>
+                </section>
+            </div>
+        </section>
+
+        <section class="reviews-section" id="customer-reviews">
+            <div class="section-heading">
+                <div>
+                    <p class="kicker">CUSTOMER FEEDBACK</p>
+                    <h2>Customer reviews{% if review_count %} ({{ review_count }}){% endif %}</h2>
+                </div>
+            </div>
+
+            {% if messages %}
+                <div class="review-messages" aria-live="polite">
+                    {% for message in messages %}<p class="review-message review-message-{{ message.tags }}">{{ message }}</p>{% endfor %}
+                </div>
+            {% endif %}
+
+            {% if user.is_authenticated and not already_reviewed %}
+                <form class="review-form" method="post" action="{% url 'submit_product_review' product.id %}">
+                    {% csrf_token %}
+                    <h3>Write a review</h3>
+                    <label for="review-rating">Your rating</label>
+                    <select id="review-rating" name="rating" required>
+                        <option value="">Choose a rating</option>
+                        <option value="5">★★★★★ - Excellent</option>
+                        <option value="4">★★★★☆ - Very good</option>
+                        <option value="3">★★★☆☆ - Good</option>
+                        <option value="2">★★☆☆☆ - Fair</option>
+                        <option value="1">★☆☆☆☆ - Poor</option>
+                    </select>
+                    <label for="review-title">Review title</label>
+                    <input id="review-title" name="title" maxlength="120" minlength="3" required>
+                    <label for="review-body">Your review</label>
+                    <textarea id="review-body" name="body" minlength="10" maxlength="2000" rows="5" required></textarea>
+                    <button type="submit" class="filter-button">Submit review</button>
+                </form>
+            {% elif not user.is_authenticated %}
+                <p class="review-login">Please <a href="{% url 'login' %}?next=/products/{{ product.id }}/#customer-reviews">log in</a> to write a review.</p>
+            {% else %}
+                <p class="review-login">You have already reviewed this cover.</p>
+            {% endif %}
+
+            <div class="review-list">
+                {% for review in reviews %}
+                    <article class="review-card">
+                        <div class="review-card-heading">
+                            <h3>{{ review.title }}</h3>
+                            <span class="rating-stars" aria-label="{{ review.rating }} out of 5 stars">{% for star in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span>
+                        </div>
+                        <p class="review-meta">
+                            {% if review.is_sample %}
+                                <span class="sample-badge">SnapCase sample review</span>
+                            {% else %}
+                                {{ review.customer.get_full_name|default:review.customer.username }}
+                            {% endif %}
+                            · {{ review.created_at|date:'d M Y' }}
+                        </p>
+                        <p class="review-body">{{ review.body }}</p>
+                    </article>
+                {% empty %}
+                    <p class="no-reviews">No customer reviews yet. Be the first to share your experience.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        {% if related_products %}
+            <section class="related-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="kicker">MORE FOR YOUR DEVICE</p>
+                        <h2>Compatible covers</h2>
+                    </div>
+                </div>
+                <div class="products">
+                    {% for entry in related_products %}
+                        {% with related=entry.product %}
+                            <article class="product-card">
+                                <a class="product-image product-detail-link" href="{% url 'product_detail' related.id %}" aria-label="View details for {{ related.name }}">
+                                    <img src="{{ entry.image_url }}" alt="{{ related.name }}">
+                                </a>
+                                <div class="product-info">
+                                    <p class="compatibility">{{ related.brand.name }} · {{ related.phone_model.name }}</p>
+                                    <h3><a class="product-name-link" href="{% url 'product_detail' related.id %}">{{ related.name }}</a></h3>
+                                    <div class="product-rating">
+                                        <span class="rating-stars" aria-hidden="true">{% for star in "12345" %}{% if forloop.counter <= entry.rating_stars %}★{% else %}☆{% endif %}{% endfor %}</span>
+                                        {% if related.review_count %}<span>{{ related.average_rating|floatformat:1 }} ({{ related.review_count }})</span>{% else %}<span>No reviews</span>{% endif %}
+                                    </div>
+                                    <p class="description">{{ related.description }}</p>
+                                    <div class="product-bottom">
+                                        <strong>₹{{ related.price }}</strong>
+                                        <a class="add-cart related-view-button" href="{% url 'product_detail' related.id %}">View details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </main>
+
+    <footer>© SnapCase · Covers made for your everyday</footer>
+    <script>
+        function getCsrfToken() {
+            return document.cookie
+                .split("; ")
+                .find((cookie) => cookie.startsWith("csrftoken="))
+                ?.split("=")[1];
+        }
+
+        const cartCount = document.querySelector(".cart-count");
+        const message = document.getElementById("detail-message");
+        const addButton = document.getElementById("detail-add-cart");
+
+        fetch("/api/session/")
+            .then((response) => response.json())
+            .then((session) => { cartCount.textContent = session.count; })
+            .catch((error) => window.console.error("Could not load cart count:", error));
+
+        addButton.addEventListener("click", async () => {
+            addButton.disabled = true;
+            message.textContent = "";
+            try {
+                const response = await fetch("/api/cart/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCsrfToken()
+                    },
+                    body: JSON.stringify({ product_id: addButton.dataset.productId })
+                });
+                const result = await response.json();
+                if (response.status === 401) {
+                    const query = new URLSearchParams({
+                        next: "/cart.html",
+                        product: addButton.dataset.productId
+                    });
+                    window.location.href = `/login/?${query}`;
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error(result.error || "Could not add this cover to your cart.");
+                }
+                cartCount.textContent = result.count;
+                window.location.href = "/cart.html";
+            } catch (error) {
+                message.textContent = error.message;
+            } finally {
+                addButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

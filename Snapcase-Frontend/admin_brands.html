@@ -1,0 +1,59 @@
+{% extends 'admin_base.html' %}
+{% block title %}Manage Brands{% endblock %}
+{% block page_title %}Manage Brands{% endblock %}
+
+{% block content %}
+<section class="management-layout">
+    <div class="form-card">
+        <h3 class="panel-title">{% if selected_brand %}Edit Brand{% else %}Add Brand{% endif %}</h3>
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            {% if selected_brand %}<input type="hidden" name="brand_id" value="{{ selected_brand.id }}">{% endif %}
+            <div class="form-row">
+                <label for="brand-name">Brand name</label>
+                <input id="brand-name" name="name" value="{{ selected_brand.name|default:'' }}" required>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="primary-button">{% if selected_brand %}Update{% else %}Save{% endif %}</button>
+                {% if selected_brand %}<a href="{% url 'admin_brands' %}" class="secondary-button">Cancel</a>{% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h3 class="panel-title">Brands</h3>
+            <a href="{% url 'admin_brands' %}" class="link-button">Reset</a>
+        </div>
+
+        <form method="get" class="search-form">
+            <input class="search-field" type="search" name="search" value="{{ search }}" placeholder="Search brands">
+            <button type="submit" class="primary-button">Search</button>
+        </form>
+
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for brand in brands %}
+                        <tr>
+                            <td>{{ brand.name }}</td>
+                            <td class="actions-cell">
+                                <a href="?edit={{ brand.id }}" class="inline-button">Edit</a>
+                                <form method="post" data-confirm-delete="true" data-confirm-message="Delete {{ brand.name }}?" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="brand_id" value="{{ brand.id }}">
+                                    <button type="submit" class="danger-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="empty-state">No brands found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

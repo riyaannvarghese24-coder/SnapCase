@@ -1,0 +1,703 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SnapCase | Create Account</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            display: grid;
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px;
+            place-items: center;
+            background: linear-gradient(135deg, #fffdf7 0%, #fff4d5 100%);
+            color: #1d2924;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        }
+
+        .registration-shell {
+            position: relative;
+            display: grid;
+            grid-template-rows: auto auto auto auto;
+            width: min(920px, 100%);
+            overflow: hidden;
+            background: linear-gradient(90deg, #fff 0 62%, #ffc42e 62% 100%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 24px 70px rgba(24, 35, 29, 0.2);
+        }
+
+        .registration-shell::after {
+            position: absolute;
+            z-index: 0;
+            bottom: -125px;
+            left: 53%;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: #fff;
+            content: "";
+        }
+
+        .registration-logo,
+        .registration-title,
+        .registration-form,
+        .form-error,
+        .login-prompt {
+            z-index: 1;
+            grid-column: 1;
+            margin-right: clamp(28px, 5vw, 64px);
+            margin-left: clamp(28px, 5vw, 64px);
+        }
+
+        .registration-back-link {
+            position: absolute;
+            z-index: 2;
+            top: 18px;
+            right: 22px;
+            color: #315541;
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .registration-back-link:hover {
+            text-decoration: underline;
+        }
+
+        .registration-logo {
+            grid-row: 1;
+            width: 176px;
+            max-width: 100%;
+            height: auto;
+            margin-top: 24px;
+            margin-bottom: 18px;
+        }
+
+        .registration-title {
+            grid-row: 2;
+            margin-top: 0;
+            margin-bottom: 0;
+            color: #17251f;
+            font-size: 40px;
+            font-weight: 800;
+            line-height: 1.08;
+        }
+
+        .registration-form {
+            display: grid;
+            grid-row: 3;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            align-content: start;
+            width: auto;
+            margin-top: 20px;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .registration-form > div {
+            display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .registration-form > div > div {
+            display: none !important;
+        }
+
+        .registration-form input {
+            width: 100% !important;
+            height: 52px !important;
+            min-height: 52px;
+            padding: 0 15px !important;
+            border: 1px solid #d9ded8 !important;
+            border-radius: 5px;
+            outline: none !important;
+            background: #fff !important;
+            color: #1d2924 !important;
+            font: inherit !important;
+            font-size: 16px !important;
+            transition: border-color 150ms ease, box-shadow 150ms ease;
+        }
+
+        .registration-form input::placeholder {
+            color: #727a74;
+            opacity: 1;
+        }
+
+        .registration-form input:focus {
+            border-color: #536f5c !important;
+            box-shadow: 0 0 0 3px rgba(83, 111, 92, 0.15);
+        }
+
+        .registration-form button {
+            grid-column: 1 / -1;
+            width: 100% !important;
+            min-height: 52px;
+            margin: 4px 0 0 !important;
+            border: 0 !important;
+            border-radius: 5px;
+            background: #f4b927 !important;
+            box-shadow: none !important;
+            color: #17251f !important;
+            cursor: pointer;
+            font: inherit !important;
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.04em;
+            transition: background 150ms ease, transform 150ms ease;
+        }
+
+        .registration-form button:hover {
+            background: #e8a90e !important;
+            transform: translateY(-1px);
+        }
+
+        .login-prompt {
+            grid-row: 5;
+            margin-top: 14px;
+            margin-bottom: 22px;
+            color: #68716b;
+            font-size: 14px !important;
+            line-height: 1.7;
+            text-align: left !important;
+        }
+
+        .form-error {
+            grid-row: 4;
+            margin-top: 12px;
+            margin-bottom: 0;
+            padding: 10px 12px;
+            border-radius: 6px;
+        }
+
+        .form-error:empty {
+            display: none;
+        }
+
+        .form-error.notification-error {
+            background: #fff0eb;
+            color: #a21d1d;
+        }
+
+        .form-error.notification-success {
+            background: #eafaf3;
+            color: #1f7653;
+        }
+
+        .login-prompt a {
+            color: #315541 !important;
+            font-weight: 800 !important;
+            text-decoration: none !important;
+        }
+
+        .login-prompt a:hover {
+            text-decoration: underline !important;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 16px;
+                background-attachment: scroll;
+            }
+
+            .registration-shell {
+                display: block;
+                width: min(520px, 100%);
+                min-height: 0;
+            }
+
+            .registration-logo,
+            .registration-title,
+            .registration-form,
+            .form-error,
+            .login-prompt {
+                margin-right: 26px;
+                margin-left: 26px;
+            }
+
+            .registration-logo {
+                width: 160px;
+                margin-top: 24px;
+                margin-bottom: 18px;
+            }
+
+            .registration-title {
+                font-size: 38px;
+            }
+
+            .registration-form {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .login-prompt {
+                margin-top: 14px;
+                margin-bottom: 22px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .registration-title {
+                font-size: 34px;
+            }
+
+            .registration-logo,
+            .registration-title,
+            .registration-form,
+            .form-error,
+            .login-prompt {
+                margin-right: 20px;
+                margin-left: 20px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- MAIN REGISTRATION CONTAINER -->
+
+    <main class="registration-shell">
+
+        <a class="registration-back-link" href="{% url 'customer_home' %}">&larr; Back to home</a>
+
+        <!-- LOGO -->
+
+        <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase Logo" class="registration-logo">
+
+
+        <!-- CREATE ACCOUNT HEADING -->
+
+        <h1 class="registration-title">
+            Create your account
+        </h1>
+
+
+        <!-- REGISTRATION FORM -->
+
+        <form id="registration-form" class="registration-form">
+            {% csrf_token %}
+
+
+            <!-- FULL NAME -->
+
+            <div style="
+                width: 315px;
+                height: 38px;
+                background-color: white;
+                border: 1px solid #dddddd;
+                border-radius: 9px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+
+                <div style="
+                    width: 42px;
+                    height: 22px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 17px;
+                    border-right: 1px solid #dddddd;
+                ">
+                    👤
+                </div>
+
+                <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Full Name"
+                    required
+                    minlength="2"
+                    maxlength="80"
+                    pattern=".*\S.*"
+                    autocomplete="name"
+                    aria-label="Full Name"
+                    style="
+                        flex: 1;
+                        height: 100%;
+                        border: none;
+                        outline: none;
+                        padding: 0 12px;
+                        font-size: 11px;
+                        color: #333333;
+                        background: transparent;
+                    "
+                >
+
+            </div>
+
+
+            <!-- PHONE NUMBER -->
+
+            <div style="
+                width: 315px;
+                height: 38px;
+                background-color: white;
+                border: 1px solid #dddddd;
+                border-radius: 9px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+
+                <div style="
+                    width: 42px;
+                    height: 22px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 17px;
+                    border-right: 1px solid #dddddd;
+                ">
+                    📞
+                </div>
+
+                <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone Number"
+                    required
+                    pattern="[0-9]{10}"
+                    title="Enter a 10-digit phone number."
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    aria-label="Phone Number"
+                    style="
+                        flex: 1;
+                        height: 100%;
+                        border: none;
+                        outline: none;
+                        padding: 0 12px;
+                        font-size: 11px;
+                        color: #333333;
+                        background: transparent;
+                    "
+                >
+
+            </div>
+
+
+            <!-- ADDRESS -->
+
+            <div style="
+                width: 315px;
+                height: 38px;
+                background-color: white;
+                border: 1px solid #dddddd;
+                border-radius: 9px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+
+                <div style="
+                    width: 42px;
+                    height: 22px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 17px;
+                    border-right: 1px solid #dddddd;
+                ">
+                    📍
+                </div>
+
+                <input
+                    type="text"
+                    name="address"
+                    placeholder="Address"
+                    required
+                    minlength="5"
+                    maxlength="200"
+                    pattern=".*\S.*"
+                    autocomplete="street-address"
+                    aria-label="Address"
+                    style="
+                        flex: 1;
+                        height: 100%;
+                        border: none;
+                        outline: none;
+                        padding: 0 12px;
+                        font-size: 11px;
+                        color: #333333;
+                        background: transparent;
+                    "
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div style="
+                width: 315px;
+                height: 38px;
+                background-color: white;
+                border: 1px solid #dddddd;
+                border-radius: 9px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+
+                <div style="
+                    width: 42px;
+                    height: 22px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 17px;
+                    border-right: 1px solid #dddddd;
+                ">
+                    ✉
+                </div>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    required
+                    maxlength="254"
+                    autocomplete="email"
+                    aria-label="Email"
+                    style="
+                        flex: 1;
+                        height: 100%;
+                        border: none;
+                        outline: none;
+                        padding: 0 12px;
+                        font-size: 11px;
+                        color: #333333;
+                        background: transparent;
+                    "
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div style="
+                width: 315px;
+                height: 38px;
+                background-color: white;
+                border: 1px solid #dddddd;
+                border-radius: 9px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+
+                <div style="
+                    width: 42px;
+                    height: 22px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 17px;
+                    border-right: 1px solid #dddddd;
+                ">
+                    🔒
+                </div>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    minlength="8"
+                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}"
+                    title="Use at least 8 characters, including an uppercase letter, a lowercase letter, and a number."
+                    autocomplete="new-password"
+                    aria-label="Password"
+                    style="
+                        flex: 1;
+                        height: 100%;
+                        border: none;
+                        outline: none;
+                        padding: 0 12px;
+                        font-size: 11px;
+                        color: #333333;
+                        background: transparent;
+                    "
+                >
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div style="
+                width: 315px;
+                height: 38px;
+                background-color: white;
+                border: 1px solid #dddddd;
+                border-radius: 9px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+
+                <div style="
+                    width: 42px;
+                    height: 22px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 17px;
+                    border-right: 1px solid #dddddd;
+                ">
+                    🔒
+                </div>
+
+                <input
+                    type="password"
+                    id="confirm-password"
+                    name="confirm_password"
+                    placeholder="Confirm Password"
+                    required
+                    autocomplete="new-password"
+                    aria-label="Confirm Password"
+                    style="
+                        flex: 1;
+                        height: 100%;
+                        border: none;
+                        outline: none;
+                        padding: 0 12px;
+                        font-size: 11px;
+                        color: #333333;
+                        background: transparent;
+                    "
+                >
+
+            </div>
+
+
+            <!-- SIGN UP BUTTON -->
+
+            <button
+                type="submit"
+                style="
+                    width: 292px;
+                    height: 36px;
+                    margin-top: 10px;
+                    margin-left: 12px;
+                    border: none;
+                    border-radius: 20px;
+                    background-color: #ffc42e;
+                    color: white;
+                    font-size: 12px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+                "
+            >
+                SIGN UP
+            </button>
+
+        </form>
+
+        <p id="form-error" class="form-error" role="status" aria-live="polite"></p>
+
+        <!-- LOGIN TEXT -->
+
+        <p class="login-prompt">
+
+            Already have an account?
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+
+        </p>
+
+
+    </main>
+
+    <script>
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirm-password");
+
+        function validatePasswordMatch() {
+            const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+            confirmPasswordInput.setCustomValidity(
+                passwordsMatch ? "" : "Passwords do not match."
+            );
+        }
+
+        passwordInput.addEventListener("input", validatePasswordMatch);
+        confirmPasswordInput.addEventListener("input", validatePasswordMatch);
+
+        const registrationForm = document.getElementById("registration-form");
+        const errorMessage = document.getElementById("form-error");
+        registrationForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            errorMessage.textContent = "";
+            const formData = new FormData(registrationForm);
+            const csrfToken = registrationForm.querySelector(
+                '[name="csrfmiddlewaretoken"]'
+            ).value;
+            try {
+                const response = await fetch("{% url 'api-register' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({
+                        full_name: formData.get("full_name"),
+                        phone: formData.get("phone"),
+                        address: formData.get("address"),
+                        email: formData.get("email"),
+                        password: formData.get("password"),
+                        confirm_password: formData.get("confirm_password")
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || "Unable to create your account.");
+                }
+                errorMessage.className = "form-error notification-success";
+                errorMessage.textContent = "Your account was created successfully. Taking you to SnapCase...";
+                window.setTimeout(() => {
+                    window.location.href = "{% url 'customer_home' %}";
+                }, 1200);
+            } catch (error) {
+                errorMessage.className = "form-error notification-error";
+                errorMessage.setAttribute("role", "alert");
+                errorMessage.textContent = error.message;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,350 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | SnapCase</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fffdf8;
+            color: #171717;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            display: flex;
+            min-height: 82px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px max(24px, 6%);
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+
+        .logo {
+            width: 190px;
+            max-width: 55vw;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        a {
+            color: #785500;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        main {
+            width: min(960px, calc(100% - 32px));
+            margin: 48px auto;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: clamp(30px, 5vw, 42px);
+        }
+
+        .intro {
+            margin: 0 0 28px;
+            color: #666;
+        }
+
+        #cart-message {
+            color: #a21d1d;
+            line-height: 1.5;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 112px minmax(0, 1fr) auto;
+            gap: 20px;
+            align-items: center;
+            padding: 18px 0;
+            border-bottom: 1px solid #e9e5dc;
+        }
+
+        .cart-item img {
+            width: 112px;
+            height: 112px;
+            border-radius: 8px;
+            background: #f5efe5;
+            object-fit: contain;
+            padding: 8px;
+        }
+
+        .cart-item h2 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .cart-item p {
+            margin: 0 0 12px;
+            color: #555;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            min-width: 34px;
+            min-height: 34px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            color: #171717;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        button:hover {
+            border-color: #d79b07;
+        }
+
+        #logout {
+            padding: 0 12px;
+        }
+
+        .remove-item {
+            border: 0;
+            color: #8e2929;
+        }
+
+        .item-total {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .cart-summary {
+            display: flex;
+            justify-content: flex-end;
+            gap: 28px;
+            padding: 24px 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        #cart-summary[hidden], #checkout-form[hidden] { display: none; }
+        .cart-notices { display: grid; gap: 8px; margin: 0 0 20px; }
+        .cart-notice { padding: 12px 16px; border-radius: 8px; }
+        .cart-notice-success { background: #eafaf3; color: #1f7653; }
+        .cart-notice-error { background: #fff0eb; color: #a21d1d; }
+        .checkout-panel { margin-top: 12px; padding: 22px; border: 1px solid #e9e5dc; border-radius: 10px; background: #fff; }
+        .checkout-panel h2 { margin: 0 0 8px; font-size: 20px; }
+        .checkout-panel label { display: grid; gap: 8px; margin: 16px 0; font-weight: 700; }
+        .checkout-panel textarea { width: 100%; min-height: 92px; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+        .checkout-button { min-height: 44px; padding: 0 20px; border: 0; border-radius: 6px; background: #f5b719; font-weight: 800; cursor: pointer; }
+        .checkout-button:hover { background: #e4a800; }
+        .payment-note { color: #666; font-size: 14px; }
+
+        .empty-cart {
+            padding: 40px 0;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            header { flex-wrap: wrap; gap: 10px; }
+            .logo { width: 140px; }
+            .header-actions { flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+
+            .cart-item {
+                grid-template-columns: 76px minmax(0, 1fr);
+                gap: 14px;
+            }
+
+            .cart-item img {
+                width: 76px;
+                height: 90px;
+            }
+
+            .item-total {
+                grid-column: 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
+            <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
+        </a>
+        <div class="header-actions">
+            <a href="{% url 'customer_home' %}">Continue shopping</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'customer_account' %}">Your account</a>
+                <a href="{% url 'customer_orders' %}">Your orders</a>
+            {% endif %}
+            <button id="logout" type="button" hidden>Log out</button>
+        </div>
+    </header>
+    <main>
+        <h1>Your cart</h1>
+        <p class="intro">Review your SnapCase favourites before checkout.</p>
+        {% if messages %}
+            <div class="cart-notices" aria-live="polite">
+                {% for message in messages %}
+                    <div class="cart-notice cart-notice-{{ message.tags }}" role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <p id="cart-message" role="alert" aria-live="polite"></p>
+        <section id="cart-items" aria-label="Cart items"></section>
+        <div id="cart-summary" class="cart-summary" hidden>
+            <span>Total</span>
+            <span id="cart-total"></span>
+        </div>
+        <form id="checkout-form" class="checkout-panel" method="post" action="{% url 'place_order' %}" hidden>
+            {% csrf_token %}
+            <h2>Delivery and payment</h2>
+            <label for="shipping-address">
+                Delivery address
+                <textarea id="shipping-address" name="shipping_address" minlength="5" maxlength="500" required>{{ shipping_address }}</textarea>
+            </label>
+            <p class="payment-note">Payment method: Cash on Delivery. Payment is recorded as pending until collected.</p>
+            <button class="checkout-button" type="submit">Place order</button>
+        </form>
+    </main>
+    <script>
+        const itemsContainer = document.getElementById("cart-items");
+        const message = document.getElementById("cart-message");
+        function getCsrfToken() {
+            return document.cookie
+                .split("; ")
+                .find((cookie) => cookie.startsWith("csrftoken="))
+                ?.split("=")[1];
+        }
+
+        function formatRupees(value) {
+            return `₹${value}`;
+        }
+
+        function renderCart(cart) {
+            itemsContainer.replaceChildren();
+            document.getElementById("cart-summary").hidden = cart.items.length === 0;
+            document.getElementById("checkout-form").hidden = cart.items.length === 0;
+            document.getElementById("cart-total").textContent = formatRupees(cart.total);
+
+            if (cart.items.length === 0) {
+                const empty = document.createElement("p");
+                empty.className = "empty-cart";
+                empty.textContent = "Your cart is empty. Find something you love in our collection.";
+                itemsContainer.append(empty);
+                return;
+            }
+
+            cart.items.forEach((item) => {
+                const row = document.createElement("article");
+                row.className = "cart-item";
+                row.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div>
+                        <h2>${item.name}</h2>
+                        <p>${formatRupees(item.price)} each</p>
+                        <div class="quantity-controls">
+                            <button type="button" data-action="decrease" aria-label="Decrease ${item.name} quantity">−</button>
+                            <span>${item.quantity}</span>
+                            <button type="button" data-action="increase" aria-label="Increase ${item.name} quantity">+</button>
+                            <button type="button" class="remove-item" data-action="remove">Remove</button>
+                        </div>
+                    </div>
+                    <div class="item-total">${formatRupees(item.line_total)}</div>
+                `;
+                row.querySelectorAll("button").forEach((button) => {
+                    button.addEventListener("click", () => changeItem(item, button.dataset.action));
+                });
+                itemsContainer.append(row);
+            });
+        }
+
+        async function requestCart(method, data) {
+            const options = { method };
+            if (data) {
+                options.headers = {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCsrfToken()
+                };
+                options.body = JSON.stringify(data);
+            }
+            const response = await fetch("{% url 'api-cart' %}", {
+                ...options
+            });
+            const result = await response.json();
+            if (response.status === 401) {
+                const signIn = document.createElement("a");
+                signIn.href = "{% url 'login' %}?next=/cart.html";
+                signIn.textContent = "Log in";
+                message.replaceChildren(document.createTextNode("Please "), signIn, document.createTextNode(" to see your cart."));
+                itemsContainer.replaceChildren();
+                return null;
+            }
+            if (!response.ok) {
+                throw new Error(result.error || "Unable to update your cart.");
+            }
+            document.getElementById("logout").hidden = false;
+            return result;
+        }
+
+        document.getElementById("logout").addEventListener("click", async () => {
+            message.textContent = "";
+            try {
+                const response = await fetch("{% url 'api-logout' %}", {
+                    method: "POST",
+                    headers: { "X-CSRFToken": getCsrfToken() }
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.error || "Unable to log out.");
+                }
+                window.location.href = "{% url 'customer_home' %}";
+            } catch (error) {
+                message.textContent = error.message;
+            }
+        });
+
+        async function changeItem(item, action) {
+            message.textContent = "";
+            try {
+                let cart;
+                if (action === "remove") {
+                    cart = await requestCart("DELETE", { product_id: item.product_id });
+                } else {
+                    const quantity = item.quantity + (action === "increase" ? 1 : -1);
+                    if (quantity < 1) {
+                        cart = await requestCart("DELETE", { product_id: item.product_id });
+                    } else {
+                        cart = await requestCart("PATCH", {
+                            product_id: item.product_id,
+                            quantity
+                        });
+                    }
+                }
+                if (cart) {
+                    renderCart(cart);
+                }
+            } catch (error) {
+                message.textContent = error.message;
+            }
+        }
+
+        requestCart("GET").then((cart) => {
+            if (cart) {
+                renderCart(cart);
+            }
+        }).catch((error) => {
+            message.textContent = error.message;
+        });
+    </script>
+</body>
+</html>

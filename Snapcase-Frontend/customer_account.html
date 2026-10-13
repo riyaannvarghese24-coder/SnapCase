@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Account | SnapCase</title>
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
+            <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
+        </a>
+        <nav aria-label="Account navigation">
+            <a href="{% url 'customer_home' %}">Shop</a>
+            <a href="{% url 'customer_orders' %}">Your orders</a>
+        </nav>
+        <div class="header-actions">
+            <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
+            <a href="/cart.html">Cart</a>
+        </div>
+    </header>
+    <main class="customer-page">
+        <div class="customer-page-heading">
+            <div>
+                <p class="kicker">YOUR SNAPCASE ACCOUNT</p>
+                <h1>Your account</h1>
+                <p>Manage your contact details and delivery address.</p>
+            </div>
+            <a class="customer-secondary-button" href="{% url 'customer_orders' %}">View all orders ({{ total_orders }})</a>
+        </div>
+
+        {% if messages %}
+            <div class="customer-notices" aria-live="polite">
+                {% for message in messages %}
+                    <div class="customer-notice customer-notice-{{ message.tags }}" role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="account-layout">
+            <section class="customer-panel">
+                <h2>Profile information</h2>
+                <form method="post" class="account-form">
+                    {% csrf_token %}
+                    <label for="customer-name">Full name</label>
+                    <input id="customer-name" name="name" type="text" maxlength="80" value="{{ customer_name }}" required>
+
+                    <label for="customer-email">Email address</label>
+                    <input id="customer-email" name="email" type="email" maxlength="150" value="{{ customer_email }}" required>
+
+                    <label for="customer-phone">Phone number</label>
+                    <input id="customer-phone" name="phone" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" value="{{ customer_phone }}" placeholder="10-digit phone number">
+
+                    <label for="customer-address">Default delivery address</label>
+                    <textarea id="customer-address" name="address" maxlength="200" rows="4" placeholder="Add a delivery address">{{ customer_address }}</textarea>
+
+                    <button class="customer-primary-button" type="submit">Save changes</button>
+                </form>
+            </section>
+
+            <section class="customer-panel">
+                <div class="customer-section-heading">
+                    <h2>Recent orders</h2>
+                    <a href="{% url 'customer_orders' %}">See all</a>
+                </div>
+                {% for order in recent_orders %}
+                    <article class="mini-order">
+                        <div>
+                            <a class="mini-order-number" href="{% url 'customer_order_detail' order.id %}">{{ order.order_number }}</a>
+                            <p>{{ order.created_at|date:"M j, Y" }} · {{ order.items.count }} item{{ order.items.count|pluralize }}</p>
+                        </div>
+                        <span class="order-status status-{{ order.status|lower }}">{{ order.status }}</span>
+                        <strong>₹{{ order.total }}</strong>
+                    </article>
+                {% empty %}
+                    <div class="customer-empty">
+                        <p>You haven't placed an order yet.</p>
+                        <a href="{% url 'customer_home' %}">Browse phone covers</a>
+                    </div>
+                {% endfor %}
+            </section>
+        </div>
+    </main>
+</body>
+</html>

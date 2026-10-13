@@ -1,0 +1,66 @@
+{% extends 'admin_base.html' %}
+{% block title %}Manage Categories{% endblock %}
+{% block page_title %}Manage Categories{% endblock %}
+
+{% block content %}
+<section class="management-layout">
+    <div class="form-card">
+        <h3 class="panel-title">{% if selected_category %}Edit Category{% else %}Add Category{% endif %}</h3>
+        <form method="post" class="form-grid">
+            {% csrf_token %}
+            {% if selected_category %}<input type="hidden" name="category_id" value="{{ selected_category.id }}">{% endif %}
+            <div class="form-row">
+                <label for="category-name">Category name</label>
+                <input id="category-name" name="name" value="{{ selected_category.name|default:'' }}" required>
+            </div>
+            <div class="form-row">
+                <label for="category-description">Description</label>
+                <textarea id="category-description" name="description">{{ selected_category.description|default:'' }}</textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="primary-button">{% if selected_category %}Update{% else %}Save{% endif %}</button>
+                {% if selected_category %}<a href="{% url 'admin_categories' %}" class="secondary-button">Cancel</a>{% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h3 class="panel-title">Categories</h3>
+            <a href="{% url 'admin_categories' %}" class="link-button">Reset</a>
+        </div>
+
+        <form method="get" class="search-form">
+            <input class="search-field" type="search" name="search" value="{{ search }}" placeholder="Search categories">
+            <button type="submit" class="primary-button">Search</button>
+        </form>
+
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Name</th><th>Description</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.description|default:'-' }}</td>
+                            <td class="actions-cell">
+                                <a href="?edit={{ category.id }}" class="inline-button">Edit</a>
+                                <form method="post" data-confirm-delete="true" data-confirm-message="Delete {{ category.name }}?" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="category_id" value="{{ category.id }}">
+                                    <button type="submit" class="danger-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="empty-state">No categories found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SnapCase | Phone Cases</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fffdf7 0%, #fff4d5 100%);
+            color: #171717;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        }
+
+        .landing-page {
+            display: grid;
+            place-items: center;
+            width: min(1440px, 100%);
+            min-height: 100vh;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .landing-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: min(700px, 100%);
+            padding: 32px;
+            text-align: center;
+        }
+
+        .logo {
+            display: block;
+            width: min(460px, 100%);
+            height: auto;
+            margin: 0 0 42px;
+            filter: drop-shadow(0 10px 0 rgba(245, 183, 43, 0.18));
+        }
+
+        .shop-now {
+            display: inline-flex;
+            min-height: 58px;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 34px;
+            border-radius: 5px;
+            background: #f5b72b;
+            box-shadow: 0 8px 20px rgba(230, 165, 25, 0.22);
+            color: #171717;
+            font-size: 17px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: background 150ms ease, transform 150ms ease;
+        }
+
+        .shop-now:hover {
+            transform: translateY(-2px);
+            background: #f2ad17;
+        }
+
+        .arrow {
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .account-text {
+            margin-top: 24px;
+            color: #60645f;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .account-text a {
+            margin-left: 5px;
+            color: #996700;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .account-text a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 720px) {
+            .landing-content {
+                padding: 24px 8px;
+            }
+
+            .logo {
+                width: min(360px, 100%);
+                margin-bottom: 28px;
+            }
+
+            .shop-now {
+                min-height: 54px;
+                padding: 0 28px;
+                font-size: 16px;
+            }
+
+            .account-text {
+                margin-top: 18px;
+                font-size: 14px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <main class="landing-page">
+        <section class="landing-content" aria-label="SnapCase shop">
+            <img
+                src="{% static 'images/snapcaseLogo.png' %}"
+                alt="SnapCase phone cases"
+                class="logo"
+            >
+
+            <a href="{% url 'customer_home' %}" class="shop-now">
+                SHOP NOW
+                <span class="arrow" aria-hidden="true">→</span>
+            </a>
+
+            <p class="account-text">
+                Already a user?
+                <a href="{% url 'login' %}">Login</a>
+                &nbsp; | &nbsp;
+                <a href="{% url 'registration' %}">Sign Up</a>
+            </p>
+        </section>
+
+    </main>
+
+
+</body>
+
+</html>

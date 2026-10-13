@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapCase | Login</title>
+    <link rel="stylesheet" href="{% static 'css/admin-dashboard.css' %}">
+</head>
+<body class="login-page">
+    <main class="login-card">
+        <a class="auth-back-link" href="{% url 'customer_home' %}">&larr; Back to home</a>
+        <div class="login-header">
+            <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase logo">
+            <h1>Welcome back</h1>
+            <p class="login-subtitle">Sign in to continue to SnapCase.</p>
+        </div>
+
+        <form method="post" action="{% url 'login' %}" class="form-stack">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <input type="hidden" name="product" value="{{ product }}">
+            <div class="login-field">
+                <label for="username_or_email">Username or email</label>
+                <input id="username_or_email" type="text" name="username_or_email" value="{{ username_or_email|default:'' }}" autocomplete="username" required>
+            </div>
+            <div class="login-field">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="primary-login-button">LOG IN</button>
+        </form>
+
+        {% if messages %}
+            <div class="auth-notifications" aria-live="polite">
+                {% for message in messages %}
+                    <div class="auth-notification message-{{ message.tags }}" role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-links">
+            <a href="{% url 'auth:password_reset' %}">Forgot password?</a>
+            <a href="{% url 'registration' %}">Create an account</a>
+        </div>
+    </main>
+</body>
+</html>

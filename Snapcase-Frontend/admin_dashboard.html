@@ -1,0 +1,96 @@
+{% extends 'admin_base.html' %}
+{% block title %}SnapCase Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="overview-grid">
+    <article class="stat-card">
+        <span class="stat-label">Total Products</span>
+        <strong>{{ total_products }}</strong>
+        <em>Live inventory</em>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Total Categories</span>
+        <strong>{{ total_categories }}</strong>
+        <em>Catalog groups</em>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Total Orders</span>
+        <strong>{{ total_orders }}</strong>
+        <em>All transactions</em>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Total Users</span>
+        <strong>{{ total_users }}</strong>
+        <em>Registered shoppers</em>
+    </article>
+    <article class="stat-card highlight">
+        <span class="stat-label">Revenue</span>
+        <strong>₹{{ total_revenue }}</strong>
+        <em>Gross sales</em>
+    </article>
+</section>
+
+<section class="content-grid">
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Recent Orders</h3>
+            <a href="{% url 'admin_orders' %}" class="link-button">View all</a>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.order_number }}</td>
+                        <td>{{ order.customer.get_full_name|default:order.customer.username }}</td>
+                        <td>{{ order.created_at|date:'d M Y' }}</td>
+                        <td><span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span></td>
+                        <td>₹{{ order.total }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">No recent orders yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h3>Inventory Summary</h3>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Stock</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory_summary %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.stock }}</td>
+                        <td>₹{{ item.price }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="empty-state">No inventory entries available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
