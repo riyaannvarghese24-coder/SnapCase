@@ -13,18 +13,21 @@
             <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
         </a>
         <nav aria-label="Main navigation">
-            <a class="active" href="{% url 'customer_home' %}">Home</a>
+            <a class="active" href="{% url 'customer_home' %}">Shop</a>
             <a href="#covers">Phone Covers</a>
         </nav>
         <div class="header-actions">
-            <a class="cart-link" href="/cart.html">Cart <span class="cart-count" aria-live="polite">0</span></a>
             {% if user.is_authenticated %}
                 <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
-                <a href="{% url 'customer_account' %}">Your account</a>
-                <a href="{% url 'customer_orders' %}">Your orders</a>
-                <a href="{% url 'logout' %}">Log out</a>
+            {% endif %}
+            <a class="cart-link" href="/cart.html">Cart <span class="cart-count" aria-live="polite">0</span></a>
+            <a class="account-nav-link" href="{% url 'wishlist' %}">Wishlist <span class="cart-count wishlist-count" aria-live="polite">0</span></a>
+            {% if user.is_authenticated %}
+                <a class="account-nav-link" href="{% url 'customer_account' %}">Your account</a>
+                <a class="account-nav-link" href="{% url 'customer_orders' %}">Your orders</a>
+                <a class="account-nav-link" href="{% url 'logout' %}">Log out</a>
             {% else %}
-                <a href="{% url 'login' %}">Log in</a>
+                <a class="account-nav-link" href="{% url 'login' %}">Log in</a>
             {% endif %}
         </div>
     </header>
@@ -95,6 +98,16 @@
                                     <span class="stock-tag">Out of stock</span>
                                 {% endif %}
                             </a>
+                            <button
+                                class="wishlist-toggle"
+                                type="button"
+                                data-product-id="{{ product.id }}"
+                                data-product-name="{{ product.name }}"
+                                data-product-price="{{ product.price }}"
+                                data-product-image="{{ entry.image_url }}"
+                                data-product-brand="{% if product.brand %}{{ product.brand.name }}{% else %}Universal{% endif %}{% if product.phone_model %} · {{ product.phone_model.name }}{% endif %}"
+                                aria-pressed="false"
+                                aria-label="Add {{ product.name }} to wishlist">♡</button>
                             <div class="product-info">
                                 <p class="compatibility">
                                     {% if product.brand %}{{ product.brand.name }}{% else %}Universal{% endif %}
@@ -135,6 +148,7 @@
     <footer>© SnapCase · Covers made for your everyday</footer>
 
     <script src="{% static 'js/cart-sync.js' %}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
     <script>
         function getCsrfToken() {
             return document.cookie

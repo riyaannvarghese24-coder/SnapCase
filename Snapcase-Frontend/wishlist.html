@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist | SnapCase</title>
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
+            <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
+        </a>
+        <div class="header-actions">
+            {% if user.is_authenticated %}
+                <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
+            {% endif %}
+            <a class="cart-link" href="{% url 'cart' %}">Cart <span class="cart-count" aria-live="polite">0</span></a>
+            <a class="account-nav-link" href="{% url 'wishlist' %}" aria-current="page">Wishlist <span class="cart-count wishlist-count" aria-live="polite">0</span></a>
+            {% if user.is_authenticated %}
+                <a class="account-nav-link" href="{% url 'customer_account' %}">Your account</a>
+                <a class="account-nav-link" href="{% url 'customer_orders' %}">Your orders</a>
+                <a class="account-nav-link" href="{% url 'logout' %}">Log out</a>
+            {% else %}
+                <a class="account-nav-link" href="{% url 'login' %}">Log in</a>
+            {% endif %}
+        </div>
+    </header>
+    <main class="wishlist-page">
+        <div class="section-heading">
+            <div>
+                <p class="kicker">YOUR SAVED COVERS</p>
+                <h1>Wishlist</h1>
+            </div>
+            <a class="details-link" href="{% url 'customer_home' %}#covers">Continue shopping</a>
+        </div>
+        <p id="wishlist-status" class="cart-item-status" role="status" aria-live="polite" hidden></p>
+        <div id="wishlist-products" class="products" aria-live="polite"></div>
+        <section id="wishlist-empty" class="wishlist-empty">
+            <h2>Your wishlist is empty</h2>
+            <p>Save covers you love with the heart button and find them here later.</p>
+            <a href="{% url 'customer_home' %}#covers">Browse phone covers</a>
+        </section>
+    </main>
+    <footer>© SnapCase · Covers made for your everyday</footer>
+    <script src="{% static 'js/cart-sync.js' %}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
+    <script>
+        window.SnapCaseCart.subscribe((cart) => {
+            document.querySelector(".cart-count").textContent = cart.count;
+        });
+    </script>
+</body>
+</html>

@@ -402,6 +402,30 @@ class AndroidStorefrontTests(TestCase):
         self.assertContains(detail, 'id="detail-message"')
         self.assertNotContains(detail, 'window.location.href = "/cart.html"')
 
+    def test_wishlist_page_and_product_controls_are_available(self):
+        brand = Brand.objects.create(name='Wishlist Test')
+        phone_model = PhoneModel.objects.create(brand=brand, name='Wishlist Model')
+        product = Product.objects.create(
+            name='Wishlist Test Cover',
+            slug='wishlist-test-cover',
+            brand=brand,
+            phone_model=phone_model,
+            category=self.category,
+            description='A product for wishlist tests.',
+            price='499.00',
+            stock=5,
+        )
+
+        storefront = self.client.get('/home.html')
+        wishlist = self.client.get('/wishlist/')
+
+        self.assertContains(storefront, "data-product-id=\"%s\"" % product.pk)
+        self.assertContains(storefront, 'data-product-name="Wishlist Test Cover"')
+        self.assertContains(storefront, 'href="/wishlist/"')
+        self.assertEqual(wishlist.status_code, 200)
+        self.assertContains(wishlist, 'Your wishlist is empty')
+        self.assertContains(wishlist, 'static/js/wishlist.js')
+
     def test_apple_product_detail_is_not_available_in_storefront(self):
         response = self.client.get(f'/products/{self.apple_product.pk}/')
 

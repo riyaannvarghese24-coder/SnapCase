@@ -36,7 +36,7 @@
             padding: .55rem .9rem;
             border: 1px solid #e7d9b4;
             border-radius: .55rem;
-            background: #fff9e9;
+            background: #fff;
             color: #785500;
             font-size: .88rem;
             font-weight: 750;
@@ -45,21 +45,37 @@
 
         .cart-header-link:hover {
             border-color: #d9a20c;
-            background: #fff1c7;
+            background: #fff;
             color: #624500;
             transform: translateY(-1px);
         }
 
+        .cart-header-link[aria-current="page"] {
+            border-color: #d9a20c;
+            background: #fff;
+            color: #624500;
+        }
+
         .cart-header-link-primary {
-            border-color: var(--yellow);
-            background: var(--yellow);
-            color: var(--ink);
+            border-color: #e7d9b4;
+            background: #fff;
+            color: #785500;
         }
 
         .cart-header-link-primary:hover {
-            border-color: #e4a800;
-            background: #e4a800;
-            color: var(--ink);
+            border-color: #d9a20c;
+            background: #fff;
+            color: #624500;
+        }
+
+        .wishlist-count {
+            display: inline-grid;
+            min-width: 1.35rem;
+            height: 1.35rem;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--yellow);
+            font-size: .78rem;
         }
 
         h1 {
@@ -237,7 +253,10 @@
         </a>
         <div class="header-actions">
             <a class="cart-header-link cart-header-link-primary" href="{% url 'customer_home' %}">Continue shopping</a>
+            <a class="cart-header-link" href="{% url 'wishlist' %}">Wishlist <span class="wishlist-count" aria-live="polite">0</span></a>
             {% if user.is_authenticated %}
+                <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
+                <a class="cart-header-link" href="{% url 'cart' %}" aria-current="page">Cart <span class="cart-count" aria-live="polite">0</span></a>
                 <a class="cart-header-link" href="{% url 'customer_account' %}">Your account</a>
                 <a class="cart-header-link" href="{% url 'customer_orders' %}">Your orders</a>
             {% endif %}
@@ -272,9 +291,11 @@
         </form>
     </main>
     <script src="{% static 'js/cart-sync.js' %}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
     <script>
         const itemsContainer = document.getElementById("cart-items");
         const message = document.getElementById("cart-message");
+        const cartCount = document.querySelector(".cart-count");
         function getCsrfToken() {
             return document.cookie
                 .split("; ")
@@ -394,6 +415,10 @@
                 message.textContent = error.message;
             }
         }
+
+        window.SnapCaseCart.subscribe((cart) => {
+            if (cartCount) cartCount.textContent = cart.count;
+        });
 
         requestCart("GET").then((cart) => {
             if (cart) {

@@ -13,11 +13,13 @@
             <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
         </a>
         <div class="header-actions">
+            <a class="account-nav-link account-nav-link-primary" href="{% url 'customer_home' %}">Shop</a>
             <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
-            <a class="account-nav-link account-nav-link-primary" href="{% url 'customer_home' %}">Continue shopping</a>
+            <a class="cart-link" href="{% url 'cart' %}">Cart <span class="cart-count" aria-live="polite">0</span></a>
+            <a class="account-nav-link" href="{% url 'wishlist' %}">Wishlist <span class="cart-count wishlist-count" aria-live="polite">0</span></a>
             <a class="account-nav-link" href="{% url 'customer_account' %}">Your account</a>
             <a class="account-nav-link" href="{% url 'customer_orders' %}" aria-current="page">Your orders</a>
-            <a class="account-nav-link" href="{% url 'cart' %}">Cart</a>
+            <a class="account-nav-link" href="{% url 'logout' %}">Log out</a>
         </div>
     </header>
     <main class="customer-page">
@@ -82,5 +84,12 @@
             {% endfor %}
         </section>
     </main>
+    <script src="{% static 'js/cart-sync.js' %}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
+    <script>
+        window.SnapCaseCart.subscribe((cart) => {
+            document.querySelector(".cart-count").textContent = cart.count;
+        });
+    </script>
 </body>
 </html>

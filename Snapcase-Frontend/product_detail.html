@@ -13,16 +13,21 @@
             <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
         </a>
         <nav aria-label="Main navigation">
-            <a href="{% url 'customer_home' %}">Home</a>
+            <a href="{% url 'customer_home' %}">Shop</a>
             <a class="active" href="{% url 'customer_home' %}#covers">Phone Covers</a>
         </nav>
         <div class="header-actions">
-            <a class="cart-link" href="/cart.html">Cart <span class="cart-count" aria-live="polite">0</span></a>
             {% if user.is_authenticated %}
                 <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
-                <a href="{% url 'logout' %}">Log out</a>
+            {% endif %}
+            <a class="cart-link" href="/cart.html">Cart <span class="cart-count" aria-live="polite">0</span></a>
+            <a class="account-nav-link" href="{% url 'wishlist' %}">Wishlist <span class="cart-count wishlist-count" aria-live="polite">0</span></a>
+            {% if user.is_authenticated %}
+                <a class="account-nav-link" href="{% url 'customer_account' %}">Your account</a>
+                <a class="account-nav-link" href="{% url 'customer_orders' %}">Your orders</a>
+                <a class="account-nav-link" href="{% url 'logout' %}">Log out</a>
             {% else %}
-                <a href="{% url 'login' %}">Log in</a>
+                <a class="account-nav-link" href="{% url 'login' %}">Log in</a>
             {% endif %}
         </div>
     </header>
@@ -42,6 +47,16 @@
             <div class="detail-gallery">
                 <div class="detail-main-image">
                     <img src="{{ image_url }}" alt="{{ product.name }}">
+                    <button
+                        class="wishlist-toggle"
+                        type="button"
+                        data-product-id="{{ product.id }}"
+                        data-product-name="{{ product.name }}"
+                        data-product-price="{{ product.price }}"
+                        data-product-image="{{ image_url }}"
+                        data-product-brand="{% if product.brand %}{{ product.brand.name }}{% else %}Universal{% endif %}{% if product.phone_model %} · {{ product.phone_model.name }}{% endif %}"
+                        aria-pressed="false"
+                        aria-label="Add {{ product.name }} to wishlist">♡</button>
                 </div>
                 <p class="gallery-caption">SnapCase phone cover</p>
             </div>
@@ -179,6 +194,16 @@
                                 <a class="product-image product-detail-link" href="{% url 'product_detail' related.id %}" aria-label="View details for {{ related.name }}">
                                     <img src="{{ entry.image_url }}" alt="{{ related.name }}">
                                 </a>
+                                <button
+                                    class="wishlist-toggle"
+                                    type="button"
+                                    data-product-id="{{ related.id }}"
+                                    data-product-name="{{ related.name }}"
+                                    data-product-price="{{ related.price }}"
+                                    data-product-image="{{ entry.image_url }}"
+                                    data-product-brand="{{ related.brand.name }}{% if related.phone_model %} · {{ related.phone_model.name }}{% endif %}"
+                                    aria-pressed="false"
+                                    aria-label="Add {{ related.name }} to wishlist">♡</button>
                                 <div class="product-info">
                                     <p class="compatibility">{{ related.brand.name }} · {{ related.phone_model.name }}</p>
                                     <h3><a class="product-name-link" href="{% url 'product_detail' related.id %}">{{ related.name }}</a></h3>
@@ -202,6 +227,7 @@
 
     <footer>© SnapCase · Covers made for your everyday</footer>
     <script src="{% static 'js/cart-sync.js' %}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
     <script>
         function getCsrfToken() {
             return document.cookie

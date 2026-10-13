@@ -52,6 +52,7 @@ urlpatterns = [
     path('logout/', views.logout_user, name='logout'),
     path('Registration.html', views.frontend_page, {'template_name': 'Registration.html'}, name='registration'),
     path('cart.html', views.frontend_page, {'template_name': 'cart.html'}, name='cart'),
+    path('wishlist/', views.frontend_page, {'template_name': 'wishlist.html'}, name='wishlist'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin-dashboard/products/', views.product_management, name='admin_products'),
     path('admin-dashboard/categories/', views.category_management, name='admin_categories'),
