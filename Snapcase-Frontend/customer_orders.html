@@ -12,13 +12,12 @@
         <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
             <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
         </a>
-        <nav aria-label="Account navigation">
-            <a href="{% url 'customer_home' %}">Shop</a>
-            <a href="{% url 'customer_account' %}">Your account</a>
-        </nav>
         <div class="header-actions">
             <span class="welcome">Hi, {{ user.first_name|default:user.username }}</span>
-            <a href="/cart.html">Cart</a>
+            <a class="account-nav-link account-nav-link-primary" href="{% url 'customer_home' %}">Continue shopping</a>
+            <a class="account-nav-link" href="{% url 'customer_account' %}">Your account</a>
+            <a class="account-nav-link" href="{% url 'customer_orders' %}" aria-current="page">Your orders</a>
+            <a class="account-nav-link" href="{% url 'cart' %}">Cart</a>
         </div>
     </header>
     <main class="customer-page">

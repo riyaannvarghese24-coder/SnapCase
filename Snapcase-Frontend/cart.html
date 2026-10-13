@@ -5,58 +5,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart | SnapCase</title>
+    <link rel="stylesheet" href="{% static 'css/storefront.css' %}">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
-            background: #fffdf8;
-            color: #171717;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #fffdf8 0%, #fff9e9 100%);
         }
 
-        header {
-            display: flex;
-            min-height: 82px;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px max(24px, 6%);
-            border-bottom: 1px solid #eee;
-            background: #fff;
+        .cart-page {
+            width: min(960px, calc(100% - 32px));
+            margin: 48px auto;
+            padding: 0 0 4rem;
         }
 
         .logo {
-            width: 190px;
-            max-width: 55vw;
+            width: 175px;
+            max-width: 38vw;
         }
 
         .header-actions {
-            display: flex;
+            gap: .65rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .cart-header-link {
+            display: inline-flex;
+            min-height: 42px;
             align-items: center;
-            gap: 18px;
-        }
-
-        a {
+            justify-content: center;
+            padding: .55rem .9rem;
+            border: 1px solid #e7d9b4;
+            border-radius: .55rem;
+            background: #fff9e9;
             color: #785500;
-            font-weight: 700;
-            text-decoration: none;
+            font-size: .88rem;
+            font-weight: 750;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
         }
 
-        main {
-            width: min(960px, calc(100% - 32px));
-            margin: 48px auto;
+        .cart-header-link:hover {
+            border-color: #d9a20c;
+            background: #fff1c7;
+            color: #624500;
+            transform: translateY(-1px);
+        }
+
+        .cart-header-link-primary {
+            border-color: var(--yellow);
+            background: var(--yellow);
+            color: var(--ink);
+        }
+
+        .cart-header-link-primary:hover {
+            border-color: #e4a800;
+            background: #e4a800;
+            color: var(--ink);
         }
 
         h1 {
             margin: 0 0 8px;
             font-size: clamp(30px, 5vw, 42px);
+            line-height: 1.15;
         }
 
         .intro {
             margin: 0 0 28px;
-            color: #666;
+            color: var(--muted);
         }
 
         #cart-message {
@@ -64,20 +78,29 @@
             line-height: 1.5;
         }
 
+        #cart-items {
+            display: grid;
+            gap: .85rem;
+        }
+
         .cart-item {
             display: grid;
             grid-template-columns: 112px minmax(0, 1fr) auto;
             gap: 20px;
             align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid #e9e5dc;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: .85rem;
+            background: #fff;
+            box-shadow: 0 5px 18px rgba(40, 34, 20, .04);
         }
 
         .cart-item img {
             width: 112px;
             height: 112px;
-            border-radius: 8px;
-            background: #f5efe5;
+            border: 1px solid var(--line);
+            border-radius: .65rem;
+            background: #faf7f0;
             object-fit: contain;
             padding: 8px;
         }
@@ -89,79 +112,111 @@
 
         .cart-item p {
             margin: 0 0 12px;
-            color: #555;
+            color: var(--muted);
         }
 
         .quantity-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: .5rem;
+        }
+
+        .quantity-controls span {
+            min-width: 1.5rem;
+            text-align: center;
+            font-weight: 700;
         }
 
         button {
             min-width: 34px;
             min-height: 34px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #fff;
-            color: #171717;
+            border: 1px solid #e7d9b4;
+            border-radius: .5rem;
+            background: #fff9e9;
+            color: var(--ink);
             cursor: pointer;
             font: inherit;
+            font-weight: 700;
+            transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
         }
 
         button:hover {
-            border-color: #d79b07;
+            border-color: #d9a20c;
+            background: #fff1c7;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:focus-visible, a:focus-visible, textarea:focus-visible {
+            outline: 3px solid rgba(245, 183, 25, .4);
+            outline-offset: 2px;
         }
 
         #logout {
-            padding: 0 12px;
+            padding: 0 .85rem;
         }
 
         .remove-item {
-            border: 0;
-            color: #8e2929;
+            margin-left: .25rem;
+            border-color: #f0d2cd;
+            background: #fff7f5;
+            color: #a21d1d;
+        }
+
+        .remove-item:hover {
+            border-color: #e5aaa1;
+            background: #fff0eb;
         }
 
         .item-total {
             font-weight: 700;
             white-space: nowrap;
+            color: #785500;
         }
 
         .cart-summary {
             display: flex;
             justify-content: flex-end;
-            gap: 28px;
-            padding: 24px 0;
+            gap: 1.5rem;
+            padding: 1.5rem .25rem;
             font-size: 20px;
             font-weight: 700;
         }
 
         #cart-summary[hidden], #checkout-form[hidden] { display: none; }
         .cart-notices { display: grid; gap: 8px; margin: 0 0 20px; }
-        .cart-notice { padding: 12px 16px; border-radius: 8px; }
+        .cart-notice { padding: 12px 16px; border: 1px solid transparent; border-radius: .6rem; }
         .cart-notice-success { background: #eafaf3; color: #1f7653; }
         .cart-notice-error { background: #fff0eb; color: #a21d1d; }
-        .checkout-panel { margin-top: 12px; padding: 22px; border: 1px solid #e9e5dc; border-radius: 10px; background: #fff; }
+        .checkout-panel { margin-top: 12px; padding: clamp(18px, 4vw, 26px); border: 1px solid #ead9aa; border-radius: .85rem; background: linear-gradient(135deg, #fff 0%, #fffaf0 100%); box-shadow: 0 8px 28px rgba(40, 34, 20, .05); }
         .checkout-panel h2 { margin: 0 0 8px; font-size: 20px; }
         .checkout-panel label { display: grid; gap: 8px; margin: 16px 0; font-weight: 700; }
-        .checkout-panel textarea { width: 100%; min-height: 92px; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
-        .checkout-button { min-height: 44px; padding: 0 20px; border: 0; border-radius: 6px; background: #f5b719; font-weight: 800; cursor: pointer; }
-        .checkout-button:hover { background: #e4a800; }
-        .payment-note { color: #666; font-size: 14px; }
+        .checkout-panel textarea { width: 100%; min-height: 92px; padding: 12px; border: 1px solid #dcd7cb; border-radius: .5rem; background: #fff; color: var(--ink); font: inherit; resize: vertical; }
+        .checkout-panel textarea:focus { border-color: #c28b00; outline: 3px solid rgba(245, 183, 25, .22); }
+        .checkout-button { min-height: 46px; padding: 0 22px; border: 0; border-radius: .55rem; background: var(--yellow); color: var(--ink); font-weight: 800; cursor: pointer; }
+        .checkout-button:hover { border-color: transparent; background: #e4a800; }
+        .payment-note { color: var(--muted); font-size: 14px; }
 
         .empty-cart {
-            padding: 40px 0;
-            color: #666;
+            padding: 2rem;
+            border: 1px dashed #d6c9a7;
+            border-radius: .85rem;
+            background: #fff;
+            color: var(--muted);
+            text-align: center;
         }
 
         @media (max-width: 600px) {
-            header { flex-wrap: wrap; gap: 10px; }
-            .logo { width: 140px; }
+            .cart-page { margin-top: 32px; }
+            .logo { width: 140px; max-width: 38vw; }
             .header-actions { flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 
             .cart-item {
                 grid-template-columns: 76px minmax(0, 1fr);
                 gap: 14px;
+                padding: 12px;
             }
 
             .cart-item img {
@@ -176,20 +231,20 @@
     </style>
 </head>
 <body>
-    <header>
+    <header class="site-header">
         <a href="{% url 'customer_home' %}" aria-label="SnapCase home">
             <img src="{% static 'images/snapcaseLogo.png' %}" alt="SnapCase" class="logo">
         </a>
         <div class="header-actions">
-            <a href="{% url 'customer_home' %}">Continue shopping</a>
+            <a class="cart-header-link cart-header-link-primary" href="{% url 'customer_home' %}">Continue shopping</a>
             {% if user.is_authenticated %}
-                <a href="{% url 'customer_account' %}">Your account</a>
-                <a href="{% url 'customer_orders' %}">Your orders</a>
+                <a class="cart-header-link" href="{% url 'customer_account' %}">Your account</a>
+                <a class="cart-header-link" href="{% url 'customer_orders' %}">Your orders</a>
             {% endif %}
-            <button id="logout" type="button" hidden>Log out</button>
+            <button class="cart-header-link" id="logout" type="button" hidden>Log out</button>
         </div>
     </header>
-    <main>
+    <main class="cart-page">
         <h1>Your cart</h1>
         <p class="intro">Review your SnapCase favourites before checkout.</p>
         {% if messages %}
