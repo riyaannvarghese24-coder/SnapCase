@@ -216,6 +216,7 @@
             <button class="checkout-button" type="submit">Place order</button>
         </form>
     </main>
+    <script src="{% static 'js/cart-sync.js' %}"></script>
     <script>
         const itemsContainer = document.getElementById("cart-items");
         const message = document.getElementById("cart-message");
@@ -332,6 +333,7 @@
                 }
                 if (cart) {
                     renderCart(cart);
+                    window.SnapCaseCart.publish();
                 }
             } catch (error) {
                 message.textContent = error.message;

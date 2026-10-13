@@ -594,6 +594,7 @@ def _authenticated_user(request):
 
 def _cart_response(user):
     items = []
+    unavailable_item_ids = []
     total = 0
     count = 0
     for item in CartItem.objects.filter(user=user).order_by('added_at', 'id'):
@@ -616,6 +617,7 @@ def _cart_response(user):
                     ),
                 }
         if product is None:
+            unavailable_item_ids.append(item.pk)
             continue
         line_total = product['price'] * item.quantity
         total += line_total
@@ -628,6 +630,8 @@ def _cart_response(user):
             'quantity': item.quantity,
             'line_total': line_total,
         })
+    if unavailable_item_ids:
+        CartItem.objects.filter(pk__in=unavailable_item_ids).delete()
     return {'items': items, 'total': total, 'count': count}
 
 
@@ -716,7 +720,7 @@ def session_view(request):
     user = _authenticated_user(request)
     if user is None:
         return JsonResponse({'authenticated': False, 'count': 0})
-    count = sum(CartItem.objects.filter(user=user).values_list('quantity', flat=True))
+    count = _cart_response(user)['count']
     return JsonResponse({'authenticated': True, 'name': user.first_name, 'count': count})
 
 
@@ -732,13 +736,14 @@ def cart_view(request):
     if data is None:
         return JsonResponse({'error': 'Please submit valid cart details.'}, status=400)
     product_id = data.get('product_id')
-    if not isinstance(product_id, str):
+    if not isinstance(product_id, str) or not product_id or len(product_id) > 32:
         return JsonResponse({'error': 'That product is not available.'}, status=400)
-    if product_id not in PRODUCTS:
-        if not product_id.startswith('db-') or not product_id[3:].isdigit():
-            return JsonResponse({'error': 'That product is not available.'}, status=400)
-        if not Product.objects.filter(pk=product_id[3:], is_active=True).exists():
-            return JsonResponse({'error': 'That product is not available.'}, status=400)
+    if request.method != 'DELETE':
+        if product_id not in PRODUCTS:
+            if not product_id.startswith('db-') or not product_id[3:].isdigit():
+                return JsonResponse({'error': 'That product is not available.'}, status=400)
+            if not Product.objects.filter(pk=product_id[3:], is_active=True).exists():
+                return JsonResponse({'error': 'That product is not available.'}, status=400)
 
     if request.method == 'POST':
         item, created = CartItem.objects.get_or_create(

@@ -81,6 +81,7 @@
                         id="detail-add-cart"
                         type="button"
                         data-product-id="db-{{ product.id }}"
+                        data-unavailable="{% if product.stock == 0 %}true{% else %}false{% endif %}"
                         {% if product.stock == 0 %}disabled{% endif %}>
                         {% if product.stock > 0 %}Add to cart{% else %}Unavailable{% endif %}
                     </button>
@@ -200,6 +201,7 @@
     </main>
 
     <footer>© SnapCase · Covers made for your everyday</footer>
+    <script src="{% static 'js/cart-sync.js' %}"></script>
     <script>
         function getCsrfToken() {
             return document.cookie
@@ -214,24 +216,23 @@
 
         function updateCartState(items, confirmation = false) {
             const item = items.find((cartItem) => cartItem.product_id === addButton.dataset.productId);
-            if (!item) return;
+            if (!item) {
+                if (addButton.dataset.unavailable !== "true") {
+                    addButton.textContent = "Add to cart";
+                }
+                message.textContent = "";
+                message.classList.remove("detail-message-success");
+                return;
+            }
             addButton.textContent = "Add another";
             message.classList.add("detail-message-success");
             message.textContent = `${confirmation ? "Added to cart" : "In cart"} · ${item.quantity}`;
         }
 
-        fetch("/api/cart/")
-            .then(async (response) => {
-                if (response.status === 401) return null;
-                if (!response.ok) throw new Error("Could not load your cart.");
-                return response.json();
-            })
-            .then((cart) => {
-                if (!cart) return;
-                cartCount.textContent = cart.count;
-                updateCartState(cart.items);
-            })
-            .catch((error) => window.console.error("Could not load cart:", error));
+        window.SnapCaseCart.subscribe((cart) => {
+            cartCount.textContent = cart.count;
+            updateCartState(cart.items);
+        });
 
         addButton.addEventListener("click", async () => {
             addButton.disabled = true;
@@ -260,6 +261,7 @@
                 }
                 cartCount.textContent = result.count;
                 updateCartState(result.items, true);
+                window.SnapCaseCart.publish();
             } catch (error) {
                 message.textContent = error.message;
             } finally {

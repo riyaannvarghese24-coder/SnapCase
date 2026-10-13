@@ -55,6 +55,59 @@ class CartApiTests(TestCase):
         self.assertEqual(removed.json()['items'], [])
         self.assertEqual(removed.json()['total'], 0)
 
+    def test_cart_removes_unavailable_products_and_reports_accurate_count(self):
+        brand = Brand.objects.create(name='Cart Test Brand')
+        category = Category.objects.create(name='Cart Test Category')
+        product = Product.objects.create(
+            name='Unavailable Cover',
+            slug='unavailable-cover',
+            brand=brand,
+            category=category,
+            description='A product that became unavailable.',
+            price='299.00',
+            stock=0,
+            is_active=False,
+        )
+        product_id = f'db-{product.pk}'
+        CartItem.objects.create(user=self.user, product_id=product_id)
+        CartItem.objects.create(user=self.user, product_id='daisy', quantity=2)
+        self.client.force_login(self.user)
+
+        cart = self.client.get('/api/cart/').json()
+        session = self.client.get('/api/session/').json()
+
+        self.assertEqual(cart['count'], 2)
+        self.assertEqual([item['product_id'] for item in cart['items']], ['daisy'])
+        self.assertEqual(session['count'], 2)
+        self.assertFalse(CartItem.objects.filter(user=self.user, product_id=product_id).exists())
+
+    def test_cart_can_remove_a_product_that_became_unavailable(self):
+        brand = Brand.objects.create(name='Inactive Cart Brand')
+        category = Category.objects.create(name='Inactive Cart Category')
+        product = Product.objects.create(
+            name='Inactive Cover',
+            slug='inactive-cover',
+            brand=brand,
+            category=category,
+            description='A product removed from the active catalog.',
+            price='199.00',
+            stock=0,
+            is_active=False,
+        )
+        product_id = f'db-{product.pk}'
+        CartItem.objects.create(user=self.user, product_id=product_id)
+        self.client.force_login(self.user)
+
+        response = self.client.delete(
+            '/api/cart/',
+            data=json.dumps({'product_id': product_id}),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['items'], [])
+        self.assertFalse(CartItem.objects.filter(user=self.user, product_id=product_id).exists())
+
     def test_cart_rejects_unknown_products_and_invalid_quantities(self):
         self.client.force_login(self.user)
         unknown_product = self.post_json('/api/cart/', {'product_id': 'not-a-product'})
